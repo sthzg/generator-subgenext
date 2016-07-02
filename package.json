@@ -1,0 +1,36 @@
+{
+  "name": "generator-subgenext",
+  "version": "0.0.1",
+  "description": "Add custom sub generators to a Yeoman host generator",
+  "main": "generators/app/index.js",
+  "files": [
+    "generators/app",
+    "generators/subgenext",
+    "utils"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sthzg/generator-subgenext.git"
+  },
+  "author": "@sthzg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sthzg/generator-subgenext/issues"
+  },
+  "homepage": "https://github.com/sthzg/generator-subgenext#readme",
+  "dependencies": {
+    "immutable": "^3.8.1",
+    "lodash": "^4.13.1",
+    "yeoman-generator": "^0.23.4"
+  },
+  "devDependencies": {
+    "mocha": "^2.5.3"
+  },
+  "scripts": {
+    "test": "mocha",
+    "test:watch": "mocha -w",
+    "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
+    "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
+    "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag beta"
+  }
+}
