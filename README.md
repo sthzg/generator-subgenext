@@ -41,23 +41,24 @@ Legend
 
 ```sh
 npm i generator-x
+npm i generator-subgenext
 npm i subgen-generator-x-foo
 npm i contrib-subgen-generator-x-bam
 npm i subgen-generator-x-hameggs
 
-yo x:subgenext scan
+yo subgenext:scan --host=x
 # Found 3 external sub generators
 # (1)  subgen-generator-x-foo      (compatible)   (not activated)
 # (2)  subgen-generator-x-hameggs  (incompatible)
 # (3)  contrib-generator-x-bam     (compatible)   (not activated)
 # To activate a generator run yo:subgenext activate <subgen-name>
   
-yo x:subgenext activate subgen-generator-x-foo
+yo subgenext:activate subgen-generator-x-foo --host=x
 # ✓ sub generator is compatible with host generator
 # ✓ linking sub generator to host generator
 # ✓ All Done!
 
-yo x:subgenext deactivate subgen-generator-x-foo
+yo subgenext:deactivate subgen-generator-x-foo --host=x
 # ✓ unlinking sub generator from host generator
 # ✓ All Done!
 ```
@@ -65,7 +66,7 @@ yo x:subgenext deactivate subgen-generator-x-foo
 * scanning for subgens is based on the package name prefix.
 * activating / deactivating an external subgen needs to write the host generator's `package.json`'s `file` property
 * checking subgen compatiblity should be done through npm's api, the information for supported host generators should be taken from the subgen's `package.json`
-* further bookkeeping (which subgens are activated) could be achieved through an additional dotfile and may enable host-generator updates that remember which subgens they should try to reactivate after the update (no mvp-feature)
+* further bookkeeping (which subgens are activated) could be achieved through an additional dotfile. This may obsolete the `--host=x` option and may enable host-generator updates that remember which subgens they should try to reactivate after the update (no mvp-feature)
 * the initial implementation may support one generator per package, but providing multiple subgens per external package should be supported later
 
-The drafted user interface achieves logic through a subgen (subgenext), that the host generator could opt-in to use. It is proposed since it doesn't demand Yeoman's maintainers to approve the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli and thus, enable seamless integration. (e.g. `yo subgenext scan`, etc.).
+The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli and thus, enable seamless integration. (e.g. `yo subgenext scan`, etc.).
