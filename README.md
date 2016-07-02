@@ -4,7 +4,7 @@ It is often desirable to add custom sub generators (subgens) to an existing gene
 
 **Practical Use Case**
 
-I use `generator-x` and and want an additional subgen, that is a) either specific to a current project or b) their maintainers simply do not wish to include, that however may need to interact with other subgens from the host generator (e.g. by invoking them programmatically and modifying the generated source after they ran)
+I use `generator-x` and and want an additional subgen, that is a) either specific to a current project or b) their maintainers simply do not wish to include. The subgen may need to interact with other subgens from the host generator (e.g. by invoking them programmatically and modifying the generated source after they ran)
 
 So I start writing the generator and copy or link it to the host generator. I wonder if, with a bit of formalization around this, it could become useful infrastructure.
 
