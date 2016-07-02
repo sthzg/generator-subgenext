@@ -1,5 +1,7 @@
 # Yo External Sub Generators – RFC
 
+Share your thoughts on [![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for horizontal modularity (unless I failed to realize an important fact about it).
 
 **Practical Use Case**
