@@ -35,8 +35,17 @@ function buildSuccess(data) {
  * @param buffer
  */
 function getDecodedAsJson(buffer) {
-  var decoder = new StringDecoder('utf8');
-  return JSON.parse(decoder.write(buffer));
+  return JSON.parse(getDecodedAsString(buffer));
+}
+
+
+/**
+ * Returns UTF-8 decoded string representation of `buffer`.
+ * @param buffer
+ */
+function getDecodedAsString(buffer) {
+  var decoder = new StringDecoder('utf-8');
+  return decoder.write(buffer);
 }
 
 
@@ -44,10 +53,10 @@ function getDecodedAsJson(buffer) {
  * Invokes npm on the shell to get a list of installed packages.
  * @returns {*}
  */
-function getModuleList() {
+function getInstalledPackages() {
   try {
-    const results = execSync("npm la --depth=0 --json");
-    return buildSuccess({ results: results });
+    const results = execSync("npm la --depth=0 --json --silent");
+    return buildSuccess({ results: getDecodedAsJson(results) });
   } catch (err) {
     return buildError(err);
   }
@@ -55,33 +64,22 @@ function getModuleList() {
 
 
 /**
- * Invokes npm on the shell to get info about `pkgName`.
+ * Returns package info for `pkgName` if found in `installed`.
  * @param pkgName   name of the package to query info for
+ * @param installed Json object of installed npm packages
  * @returns {*}
  */
-function getPkgInfo(pkgName) {
-  try {
-    const results = getDecodedAsJson(execSync(`npm la ${pkgName} --json`));
+function getPkgInfo(pkgName, installed) {
+  const pkg = lodash.find(installed, pkg => pkg.name === pkgName);
 
-    if (results.hasError) {
-      return buildError(results.error);
-    }
-
-    if (typeof results.dependencies[pkgName] === 'undefined') {
-      return buildError(`${pkgName} doesn't seem to be available as dependency.`);
-    }
-
-    let result = results.dependencies[pkgName];
-
-    return buildSuccess({
-      path    : result.path,
-      name    : result.name,
-      version : result.version
-    });
-
-  } catch (err) {
-    return buildError(err);
-  }
+  return (pkg !== undefined)
+    ? buildSuccess({
+      path    : pkg.path,
+      name    : pkg.name,
+      version : pkg.version
+    })
+    : buildError(`${pkgName} not found in installed packages.`)
+    ;
 }
 
 
@@ -116,10 +114,11 @@ function getSubgenBaseName(host, patterns, pkgName) {
  * Returns whether `subgen` is activated on the host generator.
  * @param host        name of the host generator
  * @param subgen      name of the sub generator
+ * @param installed   Json object of installed npm packages
  * @returns {*}
  */
-function checkActivationState(host, subgen) {
-  var hostPkg = getPkgInfo(host);
+function checkActivationState(host, subgen, installed) {
+  var hostPkg = getPkgInfo(host, installed);
 
   if (hostPkg.hasError) {
     return buildError(`Couldn't get information for package ${host}. Error: ${hostPkg.error}`);
@@ -133,23 +132,31 @@ function checkActivationState(host, subgen) {
 
 
 /**
+ * Checks if `pkgName` exists in installed npm packages.
+ * @param pkgName   name of the package to query info for
+ * @param installed Json object of installed npm packages
+ * @returns {boolean}
+ */
+function checkPkgExists(pkgName, installed) {
+  const regex   = new RegExp(`^${pkgName}$`);
+  return lodash.some(installed, dep => regex.exec(dep.name) !== null);
+}
+
+
+/**
  * Scans current package for installed subgens.
  *
  * Subgens are installed as regular npm packages and follow a naming convention by which they can be determined.
  *
  * @param prefixes    an array of prefixes for package names that are considered to be subgens
  * @param host        name of the host generator
+ * @param installed   Json object of currently installed npm packages
  * @returns {*}
  */
-function findExternalSubgens(prefixes, host) {
-  const mods = getModuleList();
-
-  if (mods.hasError) { return mods; }
-
-  var results = getDecodedAsJson(mods.results);
+function findExternalSubgens(prefixes, host, installed) {
   var regexps = buildPrefixRegexps(prefixes, host);
 
-  const matches = lodash.filter(results.dependencies, dep => {
+  const matches = lodash.filter(installed, dep => {
     return lodash.some(regexps.filter(regex => regex.exec(dep.name) !== null));
   });
 
@@ -182,5 +189,8 @@ function sortCharArrByLength(arr, desc=true) {
 
 module.exports = {
   checkActivationState,
+  checkPkgExists,
+  getPkgInfo,
+  getInstalledPackages,
   findExternalSubgens
 };

@@ -11,17 +11,17 @@ module.exports = generators.Base.extend({
   constructor: function () {
     generators.Base.apply(this, arguments);
 
-    /**
-     * Map of available generators.
-     * @type {Array}
-     */
-    this.available = [];
-
     // Mute unresolved function or method warnings
     this.option  = this.option  || null;
     this.options = this.options || null;
     this.env     = this.env     || null;
     this.log     = this.log     || null;
+
+    /**
+     * Map of available generators.
+     * @type {Array}
+     */
+    this.available = [];
 
     /**
      * Basename of the host generator.
@@ -34,6 +34,14 @@ module.exports = generators.Base.extend({
      * @type {null}
      */
     this.hostFullName = null;
+
+    /**
+     * Json representation of all installed packages in depth=0
+     * We cache this value in a variable since invoking the shell command is expensive and slow.
+     *
+     * @type {null}
+     */
+    this.pkgList = null;
 
     this.option('host', {
       desc     : 'Name of the host generator',
@@ -55,10 +63,32 @@ module.exports = generators.Base.extend({
         this.env.error('Please provide the name of the host generator by typing --host=<generator-name>');
       }
 
-      // TODO validate that a generator with that name is available.
-
       this.hostBaseName = this.options.host;
       this.hostFullName = 'generator-' + this.options.host;
+    },
+
+
+    /**
+     * Caches installed npm packages in class variable.
+     */
+    cacheInstalledPackages: function() {
+      const pkgQ = utils.getInstalledPackages();
+
+      if (pkgQ.hasError) {
+        this.env.error(`Retrieving a list of installed packages failed. Error: ${pkgQ.error}`);
+      }
+
+      this.pkgList = pkgQ.results;
+    },
+
+
+    /**
+     * Validates that the required host generator exists in the installed packages.
+     */
+    validateHostgenExists: function() {
+      if (!utils.checkPkgExists(this.hostFullName, this.pkgList.dependencies)) {
+        this.env.error(`Couldn't verify that host generator ${this.hostFullName} is installed.`);
+      }
     }
   },
 
@@ -69,7 +99,7 @@ module.exports = generators.Base.extend({
      * Scans package for installed subgens.
      */
     scan: function() {
-      const extgens = utils.findExternalSubgens(constants.subgenPrefixPatterns, this.hostBaseName);
+      const extgens = utils.findExternalSubgens(constants.subgenPrefixPatterns, this.hostBaseName, this.pkgList.dependencies);
 
       if (extgens.hasError) {
         this.env.error("The npm list command threw an error and we can't proceed. :(", extgens.error);
@@ -92,10 +122,10 @@ module.exports = generators.Base.extend({
      */
     checkActivationState: function() {
       this.available.forEach(subgen => {
-        const check = utils.checkActivationState(this.hostFullName, subgen.basename);
+        const check = utils.checkActivationState(this.hostFullName, subgen.basename, this.pkgList.dependencies);
 
         if (check.hasError) {
-          this.env.error(`Checking the activation state for ${subgen.basename} failed. Error: `, check.error);
+          this.env.error(`Checking the activation state for ${subgen.basename} failed. Error: ${check.error}`);
         }
 
         subgen.isActivated = utils.checkActivationState(this.hostFullName, subgen.basename).result;
@@ -118,6 +148,7 @@ module.exports = generators.Base.extend({
         this.log(`(${idx + 1}) ${gen.name}\t\t${dispActive}`);
       });
     }
+
   }
 
 });
