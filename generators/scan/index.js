@@ -31,7 +31,7 @@ module.exports = generators.Base.extend({
 
     /**
      * Fully qualified package name of the host generator.
-     * @type {null}
+     * @type {?String}
      */
     this.hostFullName = null;
 
@@ -39,7 +39,7 @@ module.exports = generators.Base.extend({
      * Json representation of all installed packages in depth=0
      * We cache this value in a variable since invoking the shell command is expensive and slow.
      *
-     * @type {null}
+     * @type {?Json}
      */
     this.pkgList = null;
 
