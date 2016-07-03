@@ -15,18 +15,18 @@ module.exports = generators.Base.extend({
 
 
   initializing: {
-    validateHostName              : function() { tasks.validateHostName(this)(); },
-    validateSubgenName            : function() { tasks.validateSubgenName(this)(); },
-    cacheInstalledPackages        : function() { tasks.cacheInstalledPackages(this)(); },
-    validateHostgenExists         : function() { tasks.validateHostgenExists(this)(); },
-    validateSubgenExists          : function() { tasks.validateSubgenExists(this)(); }
+    validateHostName              : function() { tasks.validateHostName(this); },
+    validateSubgenName            : function() { tasks.validateSubgenName(this); },
+    cacheInstalledPackages        : function() { tasks.cacheInstalledPackages(this); },
+    validateHostgenExists         : function() { tasks.validateHostgenExists(this); },
+    validateSubgenExists          : function() { tasks.validateSubgenExists(this); }
   },
 
 
   default: {
-    scanForInstalledSubgens       : function() { tasks.scanForInstalledSubgens(this)(); },
-    validateCompatibility         : function() { tasks.validateCompatibility()(); },
-    checkActivationState          : function() { tasks.checkActivationState(this)(); }
+    scanForInstalledSubgens       : function() { tasks.scanForInstalledSubgens(this); },
+    validateCompatibility         : function() { tasks.validateCompatibility(); },
+    checkActivationState          : function() { tasks.checkActivationState(this); }
   }
 
 });

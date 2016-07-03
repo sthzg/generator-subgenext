@@ -74,14 +74,12 @@ function injectSubgenArg(generator) {
  * Validates input for --host option.
  */
 function validateHostName(generator) {
-  return () => {
-    if (typeof generator.options.host === 'undefined') {
-      generator.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
-    }
-
-    generator.hostBaseName = generator.options.host;
-    generator.hostFullName = 'generator-' + generator.options.host;
+  if (typeof generator.options.host === 'undefined') {
+    generator.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
   }
+
+  generator.hostBaseName = generator.options.host;
+  generator.hostFullName = 'generator-' + generator.options.host;
 }
 
 
@@ -89,9 +87,7 @@ function validateHostName(generator) {
  * Validates input for the positional `subgen` argument
  */
 function validateSubgenName(generator) {
-  return () => {
-    generator.subgenName = generator.subgen;
-  }
+  generator.subgenName = generator.subgen;
 }
 
 
@@ -99,15 +95,13 @@ function validateSubgenName(generator) {
  * Caches installed npm packages in class variable.
  */
 function cacheInstalledPackages(generator) {
-  return () => {
-    const pkgQ = utils.getInstalledPackages();
+  const pkgQ = utils.getInstalledPackages();
 
-    if (pkgQ.hasError) {
-      generator.env.error(`Retrieving a list of installed packages failed. Error: ${pkgQ.error}`);
-    }
-
-    generator.pkgList = pkgQ.results;
+  if (pkgQ.hasError) {
+    generator.env.error(`Retrieving a list of installed packages failed. Error: ${pkgQ.error}`);
   }
+
+  generator.pkgList = pkgQ.results;
 }
 
 
@@ -117,10 +111,8 @@ function cacheInstalledPackages(generator) {
  * @depends
  */
 function validateHostgenExists(generator) {
-  return () => {
-    if (!utils.checkPkgExists(generator.hostFullName, generator.pkgList.dependencies)) {
-      generator.env.error(`Couldn't verify that host generator ${generator.hostFullName} is installed.`);
-    }
+  if (!utils.checkPkgExists(generator.hostFullName, generator.pkgList.dependencies)) {
+    generator.env.error(`Couldn't verify that host generator ${generator.hostFullName} is installed.`);
   }
 }
 
@@ -131,14 +123,12 @@ function validateHostgenExists(generator) {
  * @depends
  */
 function validateSubgenExists(generator) {
-  return () => {
-    // TODO Fix ambiguity problems with subgen validation check.
-    // Currently all we do is matching `subgenName` as a substring, which has two problems:
-    // 1. ambiguous when multiple subgens share a token, e.g. subgen-helloworld, subgen-helloworld-evening
-    // 2. ambiguous on vendor and contrib subgens with same name (e.g. subgen-controller and contrib-subgen-controller)
-    if (!utils.checkPkgExists(generator.subgenName, generator.pkgList.dependencies, false)) {
-      generator.env.error(`Couldn't verify that subgen ${generator.subgenName} is installed.`);
-    }
+  // TODO Fix ambiguity problems with subgen validation check.
+  // Currently all we do is matching `subgenName` as a substring, which has two problems:
+  // 1. ambiguous when multiple subgens share a token, e.g. subgen-helloworld, subgen-helloworld-evening
+  // 2. ambiguous on vendor and contrib subgens with same name (e.g. subgen-controller and contrib-subgen-controller)
+  if (!utils.checkPkgExists(generator.subgenName, generator.pkgList.dependencies, false)) {
+    generator.env.error(`Couldn't verify that subgen ${generator.subgenName} is installed.`);
   }
 }
 
@@ -147,19 +137,17 @@ function validateSubgenExists(generator) {
  * Scans package for installed subgens.
  */
 function scanForInstalledSubgens(generator) {
-  return () => {
-    const extgens = utils.findExternalSubgens(
-      constants.SUBGEN_PREFIX_PATTERNS,
-      generator.hostBaseName,
-      generator.pkgList.dependencies
-    );
+  const extgens = utils.findExternalSubgens(
+    constants.SUBGEN_PREFIX_PATTERNS,
+    generator.hostBaseName,
+    generator.pkgList.dependencies
+  );
 
-    if (extgens.hasError) {
-      generator.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
-    }
-
-    generator.availableExtgens = extgens.results;
+  if (extgens.hasError) {
+    generator.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
   }
+
+  generator.availableExtgens = extgens.results;
 }
 
 
@@ -167,17 +155,15 @@ function scanForInstalledSubgens(generator) {
  * Adds activation state information to the list of availableExtgens external subgens.
  */
 function checkActivationState(generator) {
-  return () => {
-    generator.availableExtgens.forEach(subgen => {
-      const check = utils.checkActivationState(generator.hostFullName, subgen.basename, generator.pkgList.dependencies);
+  generator.availableExtgens.forEach(subgen => {
+    const check = utils.checkActivationState(generator.hostFullName, subgen.basename, generator.pkgList.dependencies);
 
-      if (check.hasError) {
-        generator.env.error(`Checking the activation state for ${subgen.basename} failed. Error: ${check.error}`);
-      }
+    if (check.hasError) {
+      generator.env.error(`Checking the activation state for ${subgen.basename} failed. Error: ${check.error}`);
+    }
 
-      subgen.isActivated = utils.checkActivationState(generator.hostFullName, subgen.basename).result;
-    });
-  };
+    subgen.isActivated = utils.checkActivationState(generator.hostFullName, subgen.basename).result;
+  });
 }
 
 
@@ -185,9 +171,7 @@ function checkActivationState(generator) {
  * Adds information whether found subgens are declared to be compatible with the hostgen version.
  */
 function validateCompatibility() {
-  return() => {
-    // TODO validate compatibility between subgen and hostgen.
-  }
+  // TODO validate compatibility between subgen and hostgen.
 }
 
 
