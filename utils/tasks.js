@@ -17,10 +17,10 @@ const utils                       = require('./utils');
 function injectDefaultConstructor(generator) {
 
     /**
-     * Map of available generators.
+     * Map of availableExtgens generators.
      * @type {Array}
      */
-    generator.available = [];
+    generator.availableExtgens = [];
 
     /**
      * Basename of the host generator.
@@ -52,6 +52,25 @@ function injectDefaultConstructor(generator) {
 
 
 /**
+ * Injects property and configuration for positional `subgen` argument.
+ * @param generator
+ */
+function injectSubgenArg(generator) {
+
+  /**
+   * Name of the subgen to apply operation on.
+   * @type {?String}
+   */
+  generator.subgenName = null;
+
+  generator.argument('subgen', {
+    type: String,
+    required: true
+  });
+}
+
+
+/**
  * Validates input for --host option.
  */
 function validateHostName(generator) {
@@ -62,6 +81,16 @@ function validateHostName(generator) {
 
     generator.hostBaseName = generator.options.host;
     generator.hostFullName = 'generator-' + generator.options.host;
+  }
+}
+
+
+/**
+ * Validates input for the positional `subgen` argument
+ */
+function validateSubgenName(generator) {
+  return () => {
+    generator.subgenName = generator.subgen;
   }
 }
 
@@ -97,13 +126,31 @@ function validateHostgenExists(generator) {
 
 
 /**
+ * Validates that the required sub generator exists in the installed packages.
+ *
+ * @depends
+ */
+function validateSubgenExists(generator) {
+  return () => {
+    // TODO Fix ambiguity problems with subgen validation check.
+    // Currently all we do is matching `subgenName` as a substring, which has two problems:
+    // 1. ambiguous when multiple subgens share a token, e.g. subgen-helloworld, subgen-helloworld-evening
+    // 2. ambiguous on vendor and contrib subgens with same name (e.g. subgen-controller and contrib-subgen-controller)
+    if (!utils.checkPkgExists(generator.subgenName, generator.pkgList.dependencies, false)) {
+      generator.env.error(`Couldn't verify that subgen ${generator.subgenName} is installed.`);
+    }
+  }
+}
+
+
+/**
  * Scans package for installed subgens.
  */
 function scanForInstalledSubgens(generator) {
   return () => {
     const extgens = utils.findExternalSubgens(
-      constants.SUBGEN_PREFIX_PATTERNS, 
-      generator.hostBaseName, 
+      constants.SUBGEN_PREFIX_PATTERNS,
+      generator.hostBaseName,
       generator.pkgList.dependencies
     );
 
@@ -111,17 +158,17 @@ function scanForInstalledSubgens(generator) {
       generator.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
     }
 
-    generator.available = extgens.results;
+    generator.availableExtgens = extgens.results;
   }
 }
 
 
 /**
- * Adds activation state information to the list of available external subgens.
+ * Adds activation state information to the list of availableExtgens external subgens.
  */
 function checkActivationState(generator) {
   return () => {
-    generator.available.forEach(subgen => {
+    generator.availableExtgens.forEach(subgen => {
       const check = utils.checkActivationState(generator.hostFullName, subgen.basename, generator.pkgList.dependencies);
 
       if (check.hasError) {
@@ -148,8 +195,11 @@ module.exports = {
   cacheInstalledPackages,
   checkActivationState,
   injectDefaultConstructor,
+  injectSubgenArg,
   scanForInstalledSubgens,
   validateCompatibility,
+  validateHostgenExists,
   validateHostName,
-  validateHostgenExists
+  validateSubgenExists,
+  validateSubgenName
 };

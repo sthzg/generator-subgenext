@@ -135,10 +135,11 @@ function checkActivationState(host, subgen, installed) {
  * Checks if `pkgName` exists in installed npm packages.
  * @param pkgName   name of the package to query info for
  * @param installed Json object of installed npm packages
+ * @param exact     flag indicating whether `pkgName` needs to match exactly 
  * @returns {boolean}
  */
-function checkPkgExists(pkgName, installed) {
-  const regex   = new RegExp(`^${pkgName}$`);
+function checkPkgExists(pkgName, installed, exact=true) {
+  const regex   = new RegExp( (exact) ? `^${pkgName}$` : pkgName );
   return lodash.some(installed, dep => regex.exec(dep.name) !== null);
 }
 

@@ -10,13 +10,16 @@ module.exports = generators.Base.extend({
   constructor: function () {
     generators.Base.apply(this, arguments);
     tasks.injectDefaultConstructor(this);
+    tasks.injectSubgenArg(this);
   },
 
 
   initializing: {
     validateHostName              : function() { tasks.validateHostName(this)(); },
+    validateSubgenName            : function() { tasks.validateSubgenName(this)(); },
     cacheInstalledPackages        : function() { tasks.cacheInstalledPackages(this)(); },
-    validateHostgenExists         : function() { tasks.validateHostgenExists(this)(); }
+    validateHostgenExists         : function() { tasks.validateHostgenExists(this)(); },
+    validateSubgenExists          : function() { tasks.validateSubgenExists(this)(); }
   },
 
 

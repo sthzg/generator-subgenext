@@ -33,9 +33,9 @@ module.exports = generators.Base.extend({
      * Prints results of the scan command to the screen.
      */
     output: function() {
-      this.log(`Found ${this.available.length} ${(this.available.length === 1) ? 'sub generator' : 'sub generators'}`);
+      this.log(`Found ${this.availableExtgens.length} ${(this.availableExtgens.length === 1) ? 'sub generator' : 'sub generators'}`);
 
-      this.available.forEach((gen, idx) => {
+      this.availableExtgens.forEach((gen, idx) => {
         const dispActive = (gen.isActivated) ? '(activated)' : '(not activated)';
         this.log(`(${idx + 1}) ${gen.name}\t\t${dispActive}`);
       });
