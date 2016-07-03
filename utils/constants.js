@@ -1,10 +1,12 @@
 'use strict';
 
-const subgenPrefixPatterns = [
+
+const SUBGEN_PREFIX_PATTERNS = [
   'contrib-subgen-',
   'subgen-'
 ];
 
+
 module.exports = {
-  subgenPrefixPatterns
+  SUBGEN_PREFIX_PATTERNS
 };
