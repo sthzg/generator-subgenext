@@ -10,6 +10,10 @@ const constants                   = require('./constants');
 const utils                       = require('./utils');
 
 
+/**
+ * Sets default properties relevant for multiple subgens on the generator object.
+ * @param generator   instance of yeoman base generator
+ */
 function injectDefaultConstructor(generator) {
 
     /**
