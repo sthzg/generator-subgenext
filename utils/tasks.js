@@ -54,7 +54,7 @@ function injectDefaultConstructor(generator) {
 /**
  * Validates input for --host option.
  */
-function validateHost(generator) {
+function validateHostName(generator) {
   return () => {
     if (typeof generator.options.host === 'undefined') {
       generator.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
@@ -99,14 +99,20 @@ function validateHostgenExists(generator) {
 /**
  * Scans package for installed subgens.
  */
-function scan() {
-  const extgens = utils.findExternalSubgens(constants.SUBGEN_PREFIX_PATTERNS, this.hostBaseName, this.pkgList.dependencies);
+function scanForInstalledSubgens(generator) {
+  return () => {
+    const extgens = utils.findExternalSubgens(
+      constants.SUBGEN_PREFIX_PATTERNS, 
+      generator.hostBaseName, 
+      generator.pkgList.dependencies
+    );
 
-  if (extgens.hasError) {
-    this.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
+    if (extgens.hasError) {
+      generator.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
+    }
+
+    generator.available = extgens.results;
   }
-
-  this.available = extgens.results;
 }
 
 
@@ -142,8 +148,8 @@ module.exports = {
   cacheInstalledPackages,
   checkActivationState,
   injectDefaultConstructor,
-  scan,
+  scanForInstalledSubgens,
   validateCompatibility,
-  validateHost,
+  validateHostName,
   validateHostgenExists
 };

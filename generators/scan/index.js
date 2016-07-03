@@ -14,14 +14,14 @@ module.exports = generators.Base.extend({
 
 
   initializing: {
-    validateHost                  : function() { tasks.validateHost(this)(); },
+    validateHostName              : function() { tasks.validateHostName(this)(); },
     cacheInstalledPackages        : function() { tasks.cacheInstalledPackages(this)(); },
     validateHostgenExists         : function() { tasks.validateHostgenExists(this)(); }
   },
 
 
   default: {
-    scan: tasks.scan,
+    scanForInstalledSubgens       : function() { tasks.scanForInstalledSubgens(this)(); },
     validateCompatibility         : function() { tasks.validateCompatibility()(); },
     checkActivationState          : function() { tasks.checkActivationState(this)(); }
   },
