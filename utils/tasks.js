@@ -7,6 +7,7 @@
 'use strict';
 
 const constants                   = require('./constants');
+const path                        = require('path');
 const utils                       = require('./utils');
 
 
@@ -16,37 +17,43 @@ const utils                       = require('./utils');
  */
 function injectDefaultConstructor(generator) {
 
-    /**
-     * Map of availableExtgens generators.
-     * @type {Array}
-     */
-    generator.availableExtgens = [];
+  /**
+   * Map of availableExtgens generators.
+   * @type {Array}
+   */
+  generator.availableExtgens = [];
 
-    /**
-     * Basename of the host generator.
-     * @type String
-     */
-    generator.hostBaseName = null;
+  /**
+   * Basename of the host generator.
+   * @type String
+   */
+  generator.hostBaseName = null;
 
-    /**
-     * Fully qualified package name of the host generator.
-     * @type {?String}
-     */
-    generator.hostFullName = null;
+  /**
+   * Fully qualified package name of the host generator.
+   * @type {?String}
+   */
+  generator.hostFullName = null;
 
-    /**
-     * Json representation of all installed packages in depth=0
-     * We cache this value in a variable since invoking the shell command is expensive and slow.
-     *
-     * @type {?Json}
-     */
-    generator.pkgList = null;
+  /**
+   * Package entry from npm list as Json.
+   * @type {?Json}
+   */
+  generator.hostPkg = null;
 
-    generator.option('host', {
-      desc     : 'Name of the host generator',
-      type     : 'String',
-      required : true
-    });
+  /**
+   * Json representation of all installed packages in depth=0
+   * We cache this value in a variable since invoking the shell command is expensive and slow.
+   *
+   * @type {?Json}
+   */
+  generator.pkgList = null;
+
+  generator.option('host', {
+    desc: 'Name of the host generator',
+    type: 'String',
+    required: true
+  });
 
 }
 
@@ -55,13 +62,31 @@ function injectDefaultConstructor(generator) {
  * Injects property and configuration for positional `subgen` argument.
  * @param generator
  */
-function injectSubgenArg(generator) {
+function makeSubgenAware(generator) {
 
   /**
    * Name of the subgen to apply operation on.
    * @type {?String}
    */
   generator.subgenName = null;
+
+  /**
+   * Package entry from npm list as Json.
+   * @type {?Json}
+   */
+  generator.subgenPkg = null;
+
+  /**
+   * Source directory of installed subgen.
+   * @type {?string}
+   */
+  generator.subgenSrc = null;
+
+  /**
+   * Destination directory of subgen in host generator.
+   * @type {null}
+   */
+  generator.subgenDest = null;
 
   generator.argument('subgen', {
     type: String,
@@ -117,6 +142,11 @@ function validateHostgenExists(generator) {
 }
 
 
+function populateHostgenPkg(generator) {
+  generator.hostPkg = utils.getPkgInfo(generator.hostFullName, generator.pkgList.dependencies);
+}
+
+
 /**
  * Validates that the required sub generator exists in the installed packages.
  *
@@ -127,7 +157,7 @@ function validateSubgenExists(generator) {
   // Currently all we do is matching `subgenName` as a substring, which has two problems:
   // 1. ambiguous when multiple subgens share a token, e.g. subgen-helloworld, subgen-helloworld-evening
   // 2. ambiguous on vendor and contrib subgens with same name (e.g. subgen-controller and contrib-subgen-controller)
-  if (!utils.checkPkgExists(generator.subgenName, generator.pkgList.dependencies, false)) {
+  if (!utils.checkPkgExists(generator.subgenName, generator.availableExtgens, false)) {
     generator.env.error(`Couldn't verify that subgen ${generator.subgenName} is installed.`);
   }
 }
@@ -156,14 +186,41 @@ function scanForInstalledSubgens(generator) {
  */
 function checkActivationState(generator) {
   generator.availableExtgens.forEach(subgen => {
-    const check = utils.checkActivationState(generator.hostFullName, subgen.basename, generator.pkgList.dependencies);
-
-    if (check.hasError) {
-      generator.env.error(`Checking the activation state for ${subgen.basename} failed. Error: ${check.error}`);
-    }
-
-    subgen.isActivated = utils.checkActivationState(generator.hostFullName, subgen.basename).result;
+    subgen.isActivated = utils.checkActivationState(generator.hostPkg, subgen.basename).result;
   });
+}
+
+
+/**
+ * Populates class member with subgen package information.
+ * @param generator
+ */
+function getSubgenPkg(generator) {
+  const subgen = utils.getPkgInfo(generator.subgenName, generator.availableExtgens, false);
+
+  if (subgen.hasError) {
+    generator.env.error(`Unable to find package entry fro ${generator.subgenName}. Error: ${subgen.error}`);
+  }
+
+  generator.subgenPkg = subgen;
+}
+
+
+/**
+ * Populates class member with subgen source path.
+ */
+function getSubgenSrcPath(generator) {
+  const pkg = generator.subgenPkg;
+  generator.subgenSrc = path.join(pkg.path, 'generators', generator.subgenName);
+}
+
+
+/**
+ * Populates class member with subgen destination path.
+ */
+function getSubgenDestPath(generator) {
+  const pkg = generator.hostPkg;
+  generator.subgenDest = path.join(pkg.path, 'extgens', generator.subgenName);
 }
 
 
@@ -178,8 +235,12 @@ function validateCompatibility() {
 module.exports = {
   cacheInstalledPackages,
   checkActivationState,
+  getSubgenDestPath,
+  getSubgenPkg,
+  getSubgenSrcPath,
   injectDefaultConstructor,
-  injectSubgenArg,
+  makeSubgenAware,
+  populateHostgenPkg,
   scanForInstalledSubgens,
   validateCompatibility,
   validateHostgenExists,

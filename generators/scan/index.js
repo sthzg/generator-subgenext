@@ -19,7 +19,8 @@ class Generator extends generators.Base {
     return {
       validateHostName                 () { tasks.validateHostName(this);                },
       cacheInstalledPackages           () { tasks.cacheInstalledPackages(this);          },
-      validateHostgenExists            () { tasks.validateHostgenExists(this);           }
+      validateHostgenExists            () { tasks.validateHostgenExists(this);           },
+      populateHostgenPkg               () { tasks.populateHostgenPkg(this);              }
     };
   }
 

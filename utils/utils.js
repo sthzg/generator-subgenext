@@ -67,10 +67,16 @@ function getInstalledPackages() {
  * Returns package info for `pkgName` if found in `installed`.
  * @param pkgName   name of the package to query info for
  * @param installed Json object of installed npm packages
+ * @param exact     flag indicating whether match has to be exact, defaults to true
  * @returns {*}
  */
-function getPkgInfo(pkgName, installed) {
-  const pkg = lodash.find(installed, pkg => pkg.name === pkgName);
+function getPkgInfo(pkgName, installed, exact=true) {
+
+  const pkg = lodash.find(
+    installed, pkg => (exact)
+      ? pkg.name === pkgName
+      : pkg.name.indexOf(pkgName) !== -1
+  );
 
   return (pkg !== undefined)
     ? buildSuccess({
@@ -112,22 +118,14 @@ function getSubgenBaseName(host, patterns, pkgName) {
 
 /**
  * Returns whether `subgen` is activated on the host generator.
- * @param host        name of the host generator
- * @param subgen      name of the sub generator
- * @param installed   Json object of installed npm packages
+ * @param hostPkg           package object for host generator
+ * @param subgenBaseName    basename for subgen
  * @returns {*}
  */
-function checkActivationState(host, subgen, installed) {
-  var hostPkg = getPkgInfo(host, installed);
-
-  if (hostPkg.hasError) {
-    return buildError(`Couldn't get information for package ${host}. Error: ${hostPkg.error}`);
-  }
-
+function checkActivationState(hostPkg, subgenBaseName) {
   return buildSuccess({
-    result: existsSync(path.join(hostPkg.path, 'generators', subgen))
+    result: existsSync(path.join(hostPkg.path, 'extgens', subgenBaseName))
   });
-
 }
 
 
@@ -135,7 +133,7 @@ function checkActivationState(host, subgen, installed) {
  * Checks if `pkgName` exists in installed npm packages.
  * @param pkgName   name of the package to query info for
  * @param installed Json object of installed npm packages
- * @param exact     flag indicating whether `pkgName` needs to match exactly 
+ * @param exact     flag indicating whether `pkgName` needs to match exactly
  * @returns {boolean}
  */
 function checkPkgExists(pkgName, installed, exact=true) {

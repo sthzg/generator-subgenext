@@ -9,10 +9,11 @@ class Generator extends generators.Base {
 
   constructor(...args) {
     super(...args);
-    
+
     tasks.injectDefaultConstructor(this);
-    tasks.injectSubgenArg(this);
+    tasks.makeSubgenAware(this);
   }
+
 
   get initializing() {
     return {
@@ -20,17 +21,38 @@ class Generator extends generators.Base {
       validateSubgenName               () { tasks.validateSubgenName(this);              },
       cacheInstalledPackages           () { tasks.cacheInstalledPackages(this);          },
       validateHostgenExists            () { tasks.validateHostgenExists(this);           },
-      validateSubgenExists             () { tasks.validateSubgenExists(this);            }
+      populateHostgenPkg               () { tasks.populateHostgenPkg(this);              }
     };
   }
 
+
   get default() {
+
     return {
       scanForInstalledSubgens          () { tasks.scanForInstalledSubgens(this);         },
       validateCompatibility            () { tasks.validateCompatibility();               },
-      checkActivationState             () { tasks.checkActivationState(this);            }
+      checkActivationState             () { tasks.checkActivationState(this);            },
+      validateSubgenExists             () { tasks.validateSubgenExists(this);            },
+      getSubgenPkg                     () { tasks.getSubgenPkg(this)                     },
+      getSubgenSrcPath                 () { tasks.getSubgenSrcPath(this)                 },
+      getSubgenDestPath                () { tasks.getSubgenDestPath(this)                }
     };
   }
+
+
+  get writing() {
+    return {
+
+      /**
+       * Copies the subgen to the host generator's directory.
+       */
+      copySubgen() {
+        this.fs.copy(this.subgenSrc, this.subgenDest);
+      }
+
+    }
+  }
+
 }
 
 module.exports = Generator;
