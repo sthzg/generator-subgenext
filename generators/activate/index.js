@@ -5,28 +5,32 @@ const tasks                       = require('../../utils/tasks');
 const utils                       = require('../../utils/utils');
 
 
-module.exports = generators.Base.extend({
+class Generator extends generators.Base {
 
-  constructor: function () {
-    generators.Base.apply(this, arguments);
+  constructor(...args) {
+    super(...args);
+    
     tasks.injectDefaultConstructor(this);
     tasks.injectSubgenArg(this);
-  },
-
-
-  initializing: {
-    validateHostName              : function() { tasks.validateHostName(this); },
-    validateSubgenName            : function() { tasks.validateSubgenName(this); },
-    cacheInstalledPackages        : function() { tasks.cacheInstalledPackages(this); },
-    validateHostgenExists         : function() { tasks.validateHostgenExists(this); },
-    validateSubgenExists          : function() { tasks.validateSubgenExists(this); }
-  },
-
-
-  default: {
-    scanForInstalledSubgens       : function() { tasks.scanForInstalledSubgens(this); },
-    validateCompatibility         : function() { tasks.validateCompatibility(); },
-    checkActivationState          : function() { tasks.checkActivationState(this); }
   }
 
-});
+  get initializing() {
+    return {
+      validateHostName                 () { tasks.validateHostName(this);                },
+      validateSubgenName               () { tasks.validateSubgenName(this);              },
+      cacheInstalledPackages           () { tasks.cacheInstalledPackages(this);          },
+      validateHostgenExists            () { tasks.validateHostgenExists(this);           },
+      validateSubgenExists             () { tasks.validateSubgenExists(this);            }
+    };
+  }
+
+  get default() {
+    return {
+      scanForInstalledSubgens          () { tasks.scanForInstalledSubgens(this);         },
+      validateCompatibility            () { tasks.validateCompatibility();               },
+      checkActivationState             () { tasks.checkActivationState(this);            }
+    };
+  }
+}
+
+module.exports = Generator;

@@ -5,42 +5,49 @@ var tasks                         = require('../../utils/tasks');
 var utils                         = require('../../utils/utils');
 
 
-module.exports = generators.Base.extend({
 
-  constructor: function () {
-    generators.Base.apply(this, arguments);
+class Generator extends generators.Base {
+
+  constructor(...args) {
+    super(...args);
+
     tasks.injectDefaultConstructor(this);
-  },
+  }
 
 
-  initializing: {
-    validateHostName              : function() { tasks.validateHostName(this); },
-    cacheInstalledPackages        : function() { tasks.cacheInstalledPackages(this); },
-    validateHostgenExists         : function() { tasks.validateHostgenExists(this); }
-  },
+  get initializing() {
+    return {
+      validateHostName                 () { tasks.validateHostName(this);                },
+      cacheInstalledPackages           () { tasks.cacheInstalledPackages(this);          },
+      validateHostgenExists            () { tasks.validateHostgenExists(this);           }
+    };
+  }
 
 
-  default: {
-    scanForInstalledSubgens       : function() { tasks.scanForInstalledSubgens(this); },
-    validateCompatibility         : function() { tasks.validateCompatibility(); },
-    checkActivationState          : function() { tasks.checkActivationState(this); }
-  },
+  get default() {
+    return {
+      scanForInstalledSubgens          () { tasks.scanForInstalledSubgens(this);         },
+      validateCompatibility            () { tasks.validateCompatibility();               },
+      checkActivationState             () { tasks.checkActivationState(this);            }
+    };
+  }
 
 
-  end: {
+  get end() {
+    return {
+      output() {
+        this.log(`Found ${this.availableExtgens.length} ${(this.availableExtgens.length === 1) ? 'sub generator' : 'sub generators'}`);
 
-    /**
-     * Prints results of the scan command to the screen.
-     */
-    output: function() {
-      this.log(`Found ${this.availableExtgens.length} ${(this.availableExtgens.length === 1) ? 'sub generator' : 'sub generators'}`);
-
-      this.availableExtgens.forEach((gen, idx) => {
-        const dispActive = (gen.isActivated) ? '(activated)' : '(not activated)';
-        this.log(`(${idx + 1}) ${gen.name}\t\t${dispActive}`);
-      });
+        this.availableExtgens.forEach((gen, idx) => {
+          const dispActive = (gen.isActivated) ? '(activated)' : '(not activated)';
+          this.log(`(${idx + 1}) ${gen.name}\t\t${dispActive}`);
+        });
+      }
     }
 
   }
 
-});
+}
+
+
+module.exports = Generator;
