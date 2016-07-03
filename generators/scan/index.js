@@ -60,7 +60,7 @@ module.exports = generators.Base.extend({
     validateHost: function() {
 
       if (typeof this.options.host === 'undefined') {
-        this.env.error('Please provide the name of the host generator by typing --host=<generator-name>');
+        this.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
       }
 
       this.hostBaseName = this.options.host;
@@ -102,7 +102,7 @@ module.exports = generators.Base.extend({
       const extgens = utils.findExternalSubgens(constants.subgenPrefixPatterns, this.hostBaseName, this.pkgList.dependencies);
 
       if (extgens.hasError) {
-        this.env.error("The npm list command threw an error and we can't proceed. :(", extgens.error);
+        this.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
       }
 
       this.available = extgens.results;
