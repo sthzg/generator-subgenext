@@ -7,6 +7,7 @@
 'use strict';
 
 const constants                   = require('./constants');
+const Immutable                   = require('immutable');
 const path                        = require('path');
 const utils                       = require('./utils');
 
@@ -48,6 +49,12 @@ function injectDefaultConstructor(generator) {
    * @type {?Json}
    */
   generator.pkgList = null;
+
+  /**
+   * Map with configuration data for subgenext (loaded from subgenext.json if exists)
+   * @type {Immutable.Map}
+   */
+  generator.subgenConfig = Immutable.Map();
 
   generator.option('host', {
     desc: 'Name of the host generator',
@@ -95,16 +102,23 @@ function makeSubgenAware(generator) {
 }
 
 
+function loadSubgenConfig(generator) {
+  const cfgPath = path.join(generator.env.cwd, 'subgenext.json');
+  if (generator.fs.exists(cfgPath)) {
+    generator.subgenConfig = generator.subgenConfig.mergeDeep(Immutable.fromJS(require(cfgPath)));
+  }
+}
+
 /**
  * Validates input for --host option.
  */
 function validateHostName(generator) {
-  if (typeof generator.options.host === 'undefined') {
+  if (typeof generator.options.host === 'undefined' && !generator.subgenConfig.get('defaultHost', false)) {
     generator.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
   }
 
-  generator.hostBaseName = generator.options.host;
-  generator.hostFullName = 'generator-' + generator.options.host;
+  generator.hostBaseName = generator.subgenConfig.get('defaultHost', generator.options.host);
+  generator.hostFullName = 'generator-' + generator.hostBaseName;
 }
 
 
@@ -239,6 +253,7 @@ module.exports = {
   getSubgenPkg,
   getSubgenSrcPath,
   injectDefaultConstructor,
+  loadSubgenConfig,
   makeSubgenAware,
   populateHostgenPkg,
   scanForInstalledSubgens,

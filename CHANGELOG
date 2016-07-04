@@ -1,0 +1,3 @@
+2016-07-04
+- <@sthzg> added support for reading config from subgenext.json file
+- <@sthzg> added support for defaultHost property in subgenext.json

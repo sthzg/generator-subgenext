@@ -17,6 +17,7 @@ class Generator extends generators.Base {
 
   get initializing() {
     return {
+      loadSubgenConfig                 () { tasks.loadSubgenConfig(this)                 },
       validateHostName                 () { tasks.validateHostName(this);                },
       validateSubgenName               () { tasks.validateSubgenName(this);              },
       cacheInstalledPackages           () { tasks.cacheInstalledPackages(this);          },

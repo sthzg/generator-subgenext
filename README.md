@@ -81,6 +81,21 @@ yo subgenext:deactivate subgen-generator-x-foo --host=x
 
 The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli and thus, enable seamless integration. (e.g. `yo subgenext scan`, etc.).
 
+##subgenext.json##
+
+You can add a `subgenext.json` file to the root dir of you project to add external configuration.
+
+**Supported config props**
+
+`defaultHost`  
+  if you omit the `--host` option on the command line it will fall back to using `defaultHost`
+
+```json
+{
+  "defaultHost": "x"
+}
+```
+
 ##Caveats##
 
 * The current way this generator looks up packages requires the host generator to be a (peer)dependency and all installed subgens to be (dev)dependencies in your `package.json`. There should be enough room for improvements.
