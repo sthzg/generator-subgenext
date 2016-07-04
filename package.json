@@ -1,6 +1,6 @@
 {
   "name": "generator-subgenext",
-  "version": "0.0.1-0",
+  "version": "0.0.1-1",
   "description": "Add custom sub generators to a Yeoman host generator",
   "main": "generators/app/index.js",
   "files": [
