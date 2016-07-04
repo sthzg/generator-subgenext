@@ -1,14 +1,22 @@
 # Yo External Sub Generators – RFC
 
-Share your thoughts on [![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for horizontal modularity under one namespace (unless I failed to realize an important fact about it).
+It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for modularity under one namespace (unless I failed to realize an important concept about it).
+
+> Feature and implementation can be seen as two independent aspects. Maybe the proposed feature in general is useful but the implementation is poor or, less likely, the other way around ;)
+
+**Modularity**
+
+It would be great to maintain one umbrella generator and inject subgens as individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
+
+The main aspect that this idea should enable is putting the subgenerator into the center of development and transform the main generator to an open hub that the user can dock an arbitary number of subgens (core and contributed) onto.
 
 **Practical Use Case**
 
 I use `generator-x` and and want an additional subgen, that is a) either specific to a current project or b) their maintainers simply do not wish to include. The subgen may need to interact with other subgens from the host generator (e.g. by invoking them programmatically and modifying the generated source after they ran)
 
-So I start writing the generator and copy or link it to the host generator. I wonder if, with a bit of formalization, this may be become useful infrastructure.
+So I start writing the generator and copy or link it to the host generator. I wonder if, with a bit of formalization, this may be become useful and automated infrastructure.
 
 **Organization**
 
@@ -72,3 +80,8 @@ yo subgenext:deactivate subgen-generator-x-foo --host=x
 * the initial implementation may support one generator per package, but providing multiple subgens per external package should be supported later
 
 The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli and thus, enable seamless integration. (e.g. `yo subgenext scan`, etc.).
+
+##Caveats##
+
+* The current way this generator looks up packages requires the host generator to be a (peer)dependency and all installed subgens to be (dev)dependencies in your `package.json`. There should be enough room for improvements.
+* Initial development in this `proof-of-concept` branch works with locally installed generators. At a later stage I'd like to inspect if and what is necessary to respect globally installed generators as well.
