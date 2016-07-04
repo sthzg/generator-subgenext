@@ -8,13 +8,17 @@ It is often desirable to add custom sub generators (subgens) to an existing gene
 
 **Modularity**
 
-It would be great to maintain one umbrella generator and inject subgens as individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
+It often would be great to maintain one barebones umbrella generator and inject subgens from individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
 
-The main aspect that this idea should enable is putting the subgenerator into the center of development and transform the main generator to an open hub that the user can dock an arbitary number of subgens (core and contributed) onto.
+The main aspect that this idea should enable is putting the subgenerator into the center of development and transforming the host generator to an open hub that the user can dock an arbitary number of subgens (core and contributed) onto. On top of this modularity it would allow different maintainers to contribute to different areas of a generator-domain while still publishing under the umbrella of the host generator.
 
-**Practical Use Case**
+**Use Case 1**
 
 I use `generator-x` and and want an additional subgen, that is a) either specific to a current project or b) their maintainers simply do not wish to include. The subgen may need to interact with other subgens from the host generator (e.g. by invoking them programmatically and modifying the generated source after they ran)
+
+**Use Case 2**
+
+I provide a generator operating on a large and multifaceted domain. It becomes obvious that one monolithic package shouldn't provide sub-generators that cover all the options available (think of the Webpack and React ecosystem with its endless variaions of loaders, flux implementations, routers, etc.). Subgens on a plugin-base could ease this versatility by still operating under one unique generator namespace.
 
 So I start writing the generator and copy or link it to the host generator. I wonder if, with a bit of formalization, this may be become useful and automated infrastructure.
 
