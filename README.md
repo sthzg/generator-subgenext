@@ -18,9 +18,11 @@ I use `generator-x` and and want an additional subgen, that is a) either specifi
 
 **Use Case 2**
 
-I provide a generator operating on a large and multifaceted domain. It becomes obvious that one monolithic package shouldn't provide sub-generators that cover all the options available (think of the Webpack and React ecosystem with its endless variaions of loaders, flux implementations, routers, etc.). Subgens on a plugin-base could ease this versatility by still operating under one unique generator namespace.
+I provide a generator operating on a large and multifaceted domain. It becomes obvious that one monolithic package shouldn't provide sub-generators that cover all the options available (think of the Webpack and React ecosystem with its endless variaions of loaders, flux implementations, routers, etc.). Subgens on a plugin-base could ease this versatility by splitting responsibilities to a larger community that would still be able to ship under one unique generator namespace.
 
-So I start writing the generator and copy or link it to the host generator. I wonder if, with a bit of formalization, this may be become useful and automated infrastructure.
+**Use Case 3**
+
+I am working on experimental features of a generator that should already be accessible to early adopters, but are a) not ready to be merged into core or b) may still be denied adoption at all.
 
 **Organization**
 
