@@ -4,8 +4,10 @@
   "description": "Add custom sub generators to a Yeoman host generator",
   "main": "generators/app/index.js",
   "files": [
+    "generators/activate",
     "generators/app",
-    "generators/subgenext",
+    "generators/deactivate",
+    "generators/scan",
     "utils"
   ],
   "repository": {
