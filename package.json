@@ -1,6 +1,6 @@
 {
   "name": "generator-subgenext",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Add custom sub generators to a Yeoman host generator",
   "main": "generators/app/index.js",
   "files": [
@@ -31,8 +31,8 @@
   "scripts": {
     "test": "mocha",
     "test:watch": "mocha -w",
-    "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
-    "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
-    "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag beta"
+    "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
+    "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
+    "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag poc"
   }
 }
