@@ -234,7 +234,7 @@ function getSubgenSrcPath(generator) {
  */
 function getSubgenDestPath(generator) {
   const pkg = generator.hostPkg;
-  generator.subgenDest = path.join(pkg.path, 'extgens', generator.subgenName);
+  generator.subgenDest = path.join(pkg.path, 'generators', generator.subgenName);
 }
 
 
