@@ -10,7 +10,7 @@ It is often desirable to add custom sub generators (subgens) to an existing gene
 
 **Modularity**
 
-It often would be great to maintain one barebones umbrella generator and inject subgens from individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
+It often would be great to maintain one barebones umbrella generator and inject subgens from individual npm packages. With `composeWith` we have the oportunity to let different generators interact with one another during the Yeoman run loop, but semantically we always ship a new generator that provides its features under its own namespace.
 
 The main aspect that this idea should enable is putting the subgenerator into the center of development and transforming the host generator to an open hub that the user can dock an arbitary number of subgens (core and contributed) onto. On top of this modularity it would allow different maintainers to contribute to different areas of a generator-domain while still publishing under the umbrella of the host generator.
 
