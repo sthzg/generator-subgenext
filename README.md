@@ -6,6 +6,8 @@ It is often desirable to add custom sub generators (subgens) to an existing gene
 
 > Feature and implementation can be seen as two independent aspects. Maybe the proposed feature in general is useful but the implementation is poor or, less likely, the other way around ;)
 
+- Wiki: [The Fully Integrated Happy Path](https://github.com/sthzg/generator-subgenext/wiki/The-Fully-Integrated-Happy-Path) probably describes the cleanest way
+
 **Modularity**
 
 It often would be great to maintain one barebones umbrella generator and inject subgens from individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
