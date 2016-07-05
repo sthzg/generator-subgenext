@@ -8,15 +8,21 @@ It is often desirable to add custom sub generators (subgens) to an existing gene
 
 **Modularity**
 
-It would be great to maintain one umbrella generator and inject subgens as individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
+It often would be great to maintain one barebones umbrella generator and inject subgens from individual npm packages. With `composeWith` we have the oportunity to let the Yeoman run loop of different generators interact with one another, but semantically we always ship a new generator that provides its features under its own namespace.
 
-The main aspect that this idea should enable is putting the subgenerator into the center of development and transform the main generator to an open hub that the user can dock an arbitary number of subgens (core and contributed) onto.
+The main aspect that this idea should enable is putting the subgenerator into the center of development and transforming the host generator to an open hub that the user can dock an arbitary number of subgens (core and contributed) onto. On top of this modularity it would allow different maintainers to contribute to different areas of a generator-domain while still publishing under the umbrella of the host generator.
 
-**Practical Use Case**
+**Use Case 1**
 
 I use `generator-x` and and want an additional subgen, that is a) either specific to a current project or b) their maintainers simply do not wish to include. The subgen may need to interact with other subgens from the host generator (e.g. by invoking them programmatically and modifying the generated source after they ran)
 
-So I start writing the generator and copy or link it to the host generator. I wonder if, with a bit of formalization, this may be become useful and automated infrastructure.
+**Use Case 2**
+
+I provide a generator operating on a large and multifaceted domain. It becomes obvious that one monolithic package shouldn't provide sub-generators that cover all the options available (think of the Webpack and React ecosystem with its endless variaions of loaders, flux implementations, routers, etc.). Subgens on a plugin-base could ease this versatility by splitting responsibilities to a larger community that would still be able to ship under one unique generator namespace.
+
+**Use Case 3**
+
+I am working on experimental features of a generator that should already be accessible to early adopters, but are a) not ready to be merged into core or b) may still be denied adoption at all.
 
 **Organization**
 
@@ -26,11 +32,11 @@ node_modules/
         package.json
         generators/
         ...
-    (2) subgen-generator-x-foo
+    (2) subgen-x-foo
         package.json
         generators/
         ...
-    (3) contrib-subgen-generator-x-bar
+    (3) contrib-subgen-x-bar
         package.json
         generators/
         ...
@@ -39,47 +45,47 @@ node_modules/
 
 Legend
 ```
-(1)     generator-x                        host generator, probably not yours  
-(2)     subgen-generator-x-foo             an 'official' subgen, maintained by the gen maintainers  
-(3)     contrib-subgen-generator-x-bam     a subgen for generator-x, developed by anyone
+(1)     generator-x              host generator, probably not yours  
+(2)     subgen-x-foo             an 'official' subgen, maintained by the gen maintainers  
+(3)     contrib-subgen-x-bam     a subgen for generator-x, developed by anyone
 ```
 
-`(2)` and `(3)` are separate npm packages where the `subgen` and `contrib-subgen` prefixes are a naming convention.
+`(2)` and `(3)` are separate npm packages where the `subgen` and `contrib-subgen` prefixes are a naming convention. Activating _currently_ injects the subgens into the host gen's `generators` directory (at later stages there will hopefully be a more elegant approach without actually moving files).
 
 
 **User interface**
 
 ```sh
+npm i -g generator-subgenext  # or optionally install it locally
 npm i generator-x
-npm i generator-subgenext
-npm i subgen-generator-x-foo
-npm i contrib-subgen-generator-x-bam
-npm i subgen-generator-x-hameggs
+npm i subgen-x-foo
+npm i subgen-x-hameggs
+npm i contrib-subgen-x-bam
 
-yo subgenext:scan --host=x
+yo subgenext:scan --host=x  # defaultHost can also be declared in a config file
 # Found 3 external sub generators
-# (1)  subgen-generator-x-foo      (compatible)   (not activated)
-# (2)  subgen-generator-x-hameggs  (incompatible)
-# (3)  contrib-generator-x-bam     (compatible)   (not activated)
+# (1)  subgen-x-foo      (compatible)   (not activated)
+# (2)  subgen-x-hameggs  (incompatible)
+# (3)  contrib-x-bam     (compatible)   (not activated)
 # To activate a generator run yo:subgenext activate <subgen-name>
   
-yo subgenext:activate subgen-generator-x-foo --host=x
+yo subgenext:activate foo
 # ✓ sub generator is compatible with host generator
 # ✓ linking sub generator to host generator
 # ✓ All Done!
 
-yo subgenext:deactivate subgen-generator-x-foo --host=x
+yo subgenext:deactivate foo
 # ✓ unlinking sub generator from host generator
 # ✓ All Done!
 ```
 
 * scanning for subgens is based on the package name prefix.
-* activating / deactivating an external subgen needs to write the host generator's `package.json`'s `file` property
+* activating / deactivating an external subgen needs to write the host generator's `package.json`'s `file` property (or doesn't it?)
 * checking subgen compatiblity should be done through npm's api, the information for supported host generators should be taken from the subgen's `package.json`
-* further bookkeeping (which subgens are activated) could be achieved through an additional dotfile. This may obsolete the `--host=x` option and may enable host-generator updates that remember which subgens they should try to reactivate after the update (no mvp-feature)
+* [partially integrated] further bookkeeping (which subgens are activated) could be achieved through an additional config file. This may obsolete the `--host=x` option and may enable host-generator updates that remember which subgens they should try to reactivate after the update (no mvp-feature)
 * the initial implementation may support one generator per package, but providing multiple subgens per external package should be supported later
 
-The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli and thus, enable seamless integration. (e.g. `yo subgenext scan`, etc.).
+The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve of the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli/env and thus, provide seamless integration. (e.g. `yo subgenext scan`, etc.).
 
 ##subgenext.json##
 
