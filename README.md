@@ -32,11 +32,11 @@ node_modules/
         package.json
         generators/
         ...
-    (2) subgen-generator-x-foo
+    (2) subgen-x-foo
         package.json
         generators/
         ...
-    (3) contrib-subgen-generator-x-bar
+    (3) contrib-subgen-x-bar
         package.json
         generators/
         ...
@@ -45,28 +45,28 @@ node_modules/
 
 Legend
 ```
-(1)     generator-x                        host generator, probably not yours  
-(2)     subgen-generator-x-foo             an 'official' subgen, maintained by the gen maintainers  
-(3)     contrib-subgen-generator-x-bam     a subgen for generator-x, developed by anyone
+(1)     generator-x              host generator, probably not yours  
+(2)     subgen-x-foo             an 'official' subgen, maintained by the gen maintainers  
+(3)     contrib-subgen-x-bam     a subgen for generator-x, developed by anyone
 ```
 
-`(2)` and `(3)` are separate npm packages where the `subgen` and `contrib-subgen` prefixes are a naming convention.
+`(2)` and `(3)` are separate npm packages where the `subgen` and `contrib-subgen` prefixes are a naming convention. Activating _currently_ injects the subgens into the host gen's `generators` directory (at later stages there will hopefully be a more elegant approach without actually moving files).
 
 
 **User interface**
 
 ```sh
+npm i -g generator-subgenext  # or optionally install it locally
 npm i generator-x
-npm i generator-subgenext
-npm i subgen-generator-x-foo
-npm i contrib-subgen-generator-x-bam
-npm i subgen-generator-x-hameggs
+npm i subgen-x-foo
+npm i subgen-x-hameggs
+npm i contrib-subgen-x-bam
 
-yo subgenext:scan --host=x
+yo subgenext:scan --host=x  # defaultHost can also be declared in a config file
 # Found 3 external sub generators
-# (1)  subgen-generator-x-foo      (compatible)   (not activated)
-# (2)  subgen-generator-x-hameggs  (incompatible)
-# (3)  contrib-generator-x-bam     (compatible)   (not activated)
+# (1)  subgen-x-foo      (compatible)   (not activated)
+# (2)  subgen-x-hameggs  (incompatible)
+# (3)  contrib-x-bam     (compatible)   (not activated)
 # To activate a generator run yo:subgenext activate <subgen-name>
   
 yo subgenext:activate foo
