@@ -54,6 +54,14 @@ class Generator extends generators.Base {
     }
   }
 
+  get end() {
+    return {
+      output() {
+        this.log.ok(`Activated ${this.subgenName}!`);
+      }
+    }
+  }
+
 }
 
 module.exports = Generator;
