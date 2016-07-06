@@ -37,6 +37,7 @@
   },
   "scripts": {
     "test": "node ./tests/index.js",
+    "tape": "tape",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag poc"

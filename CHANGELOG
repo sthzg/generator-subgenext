@@ -1,3 +1,6 @@
+2016-07-06
+- <@sthzg> added tape as npm run script
+
 2016-07-04
 - <@sthzg> added support for reading config from subgenext.json file
 - <@sthzg> added support for defaultHost property in subgenext.json
