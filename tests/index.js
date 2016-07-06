@@ -9,7 +9,7 @@ const helpers                     = require('yeoman-test');
 
 test('subgenext:app', function(t) {
   t.plan(1);
-  
+
   helpers
     .run(path.join(__dirname, '../generators/app'))
     .on('error', function(gen) {
@@ -23,7 +23,7 @@ test('subgenext:scan --host yoburger', function(t) {
   helpers
     .run(path.join(__dirname, '../generators/scan'))
     .inTmpDir(function (dir) {
-      fs.copySync(path.join(__dirname, 'package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
       fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
       fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq'), path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq'));
     })
@@ -44,7 +44,7 @@ test('subgenext:activate bbq --host yoburger', function(t) {
   helpers
     .run(path.join(__dirname, '../generators/activate'))
     .inTmpDir(function (dir) {
-      fs.copySync(path.join(__dirname, 'package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
       fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
       fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq'), path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq'));
     })
@@ -74,7 +74,7 @@ test('subgenext:activate nonExistent --host yoburger', function(t) {
   helpers
     .run(path.join(__dirname, '../generators/activate'))
     .inTmpDir(function (dir) {
-      fs.copySync(path.join(__dirname, 'package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
       fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
       fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq'), path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq'));
     })
@@ -96,7 +96,7 @@ test('subgenext:deactivate bbq --host yoburger', function(t) {
   helpers
     .run(path.join(__dirname, '../generators/deactivate'))
     .inTmpDir(function (dir) {
-      fs.copySync(path.join(__dirname, 'package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
       fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
       fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq'), path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq'));
     })
@@ -118,7 +118,7 @@ test('subgenext:deactivate nonExistent --host yoburger', function(t) {
   helpers
     .run(path.join(__dirname, '../generators/deactivate'))
     .inTmpDir(function (dir) {
-      fs.copySync(path.join(__dirname, 'package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
       fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
       fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq'), path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq'));
     })
