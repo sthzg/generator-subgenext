@@ -1,7 +1,7 @@
 # Yo External Sub Generators – RFC
 
 [![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
-[![Build Status](https://travis-ci.org/sthzg/generator-subgenext.svg?branch=master)](https://travis-ci.org/sthzg/generator-subgenext)
+[![Build Status](https://travis-ci.org/sthzg/generator-subgenext.svg?branch=proof-of-concept)](https://travis-ci.org/sthzg/generator-subgenext)
 
 It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for modularity under one namespace (unless I failed to realize an important concept about it).
 
