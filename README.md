@@ -108,3 +108,10 @@ You can add a `subgenext.json` file to the root dir of you project to add extern
 
 * The current way this generator looks up packages requires the host generator to be a (peer)dependency and all installed subgens to be (dev)dependencies in your `package.json`. There should be enough room for improvements.
 * Initial development in this `proof-of-concept` branch works with locally installed generators. At a later stage I'd like to inspect if and what is necessary to respect globally installed generators as well.
+
+##Testing##
+To invoke the test suite run:
+
+```sh
+npm run test
+```
