@@ -1,0 +1,7 @@
+{
+  "name": "generator-subgenext-test",
+  "dependencies": {
+    "contrib-subgen-yoburger-bbq": "0.0.2",
+    "generator-yoburger": "0.0.3"
+  }
+}
