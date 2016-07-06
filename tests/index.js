@@ -1,8 +1,11 @@
+'use strict';
+
 const fs                          = require('fs-extra');
 const test                        = require('tape');
 const path                        = require('path');
 const assert                      = require('yeoman-assert');
 const helpers                     = require('yeoman-test');
+
 
 test('subgenext:app', function(t) {
   t.plan(1);
