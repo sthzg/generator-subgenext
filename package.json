@@ -28,11 +28,12 @@
     "yeoman-generator": "^0.23.4"
   },
   "devDependencies": {
-    "mocha": "^2.5.3"
+    "tape": "^4.6.0",
+    "yeoman-assert": "^2.2.1",
+    "yeoman-test": "^1.4.0"
   },
   "scripts": {
-    "test": "mocha",
-    "test:watch": "mocha -w",
+    "test": "node ./tests/index.js",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag poc"
