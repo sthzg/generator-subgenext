@@ -36,7 +36,7 @@ test('subgenext:scan --host yoburger', function(t) {
 });
 
 test('subgenext:activate bbq --host yoburger', function(t) {
-  t.plan(1);
+  t.plan(2);
 
   helpers
     .run(path.join(__dirname, '../generators/activate'))
@@ -54,6 +54,14 @@ test('subgenext:activate bbq --host yoburger', function(t) {
     })
     .on('end', function() {
       t.pass('Activated the sub generator');
+
+      try {
+        assert.file(['node_modules/generator-yoburger/generators/bbq/index.js']);
+        t.pass('Copies sub generator files');
+      }
+      catch(e) {
+        t.fail('Did not copy sub generator files');
+      }
     });
 });
 
