@@ -1,4 +1,5 @@
 2016-07-06
+- <@sthzg> refactored tasks to base package detection on `yeoman-environment`
 - <@sthzg> added tape as npm run script
 
 2016-07-04

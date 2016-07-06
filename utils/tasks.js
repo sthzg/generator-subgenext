@@ -8,6 +8,7 @@
 
 const constants                   = require('./constants');
 const Immutable                   = require('immutable');
+const lodash                      = require('lodash');
 const path                        = require('path');
 const utils                       = require('./utils');
 
@@ -131,33 +132,37 @@ function validateSubgenName(generator) {
 
 
 /**
- * Caches installed npm packages in class variable.
+ * Caches root paths to installed npm packages into class member.
  */
 function cacheInstalledPackages(generator) {
-  const pkgQ = utils.getInstalledPackages();
-
-  if (pkgQ.hasError) {
-    generator.env.error(`Retrieving a list of installed packages failed. Error: ${pkgQ.error}`);
-  }
-
-  generator.pkgList = pkgQ.results;
+  generator.pkgList = utils.populatePkgStoreFromPaths(
+    utils.getInstalledPkgPaths(generator.env.getNpmPaths())
+  );
 }
 
 
 /**
- * Validates that the required host generator exists in the installed packages.
- *
- * @depends
+ * Validates that Yeoman can resolve the host generator.
  */
 function validateHostgenExists(generator) {
-  if (!utils.checkPkgExists(generator.hostFullName, generator.pkgList.dependencies)) {
+  if (!lodash.some(generator.env.getGeneratorNames(), name => name === generator.hostBaseName)) {
     generator.env.error(`Couldn't verify that host generator ${generator.hostFullName} is installed.`);
   }
 }
 
 
+/**
+ * Populates `hostPkg` class member with package information from the host generator.
+ * @param generator
+ */
 function populateHostgenPkg(generator) {
-  generator.hostPkg = utils.getPkgInfo(generator.hostFullName, generator.pkgList.dependencies);
+  const pkgQ = utils.getPkgInfo(generator.hostFullName, generator.pkgList);
+
+  if (pkgQ.hasError) {
+    generator.env.error(`Couldn't get package info for ${generator.hostFullName} .`);
+  }
+
+  generator.hostPkg = pkgQ.pkg;
 }
 
 
@@ -184,12 +189,8 @@ function scanForInstalledSubgens(generator) {
   const extgens = utils.findExternalSubgens(
     constants.SUBGEN_PREFIX_PATTERNS,
     generator.hostBaseName,
-    generator.pkgList.dependencies
+    generator.pkgList
   );
-
-  if (extgens.hasError) {
-    generator.env.error(`The npm list command threw an error and we can't proceed. :( Error: ${extgens.error}`);
-  }
 
   generator.availableExtgens = extgens.results;
 }
@@ -216,7 +217,7 @@ function getSubgenPkg(generator) {
     generator.env.error(`Unable to find package entry fro ${generator.subgenName}. Error: ${subgen.error}`);
   }
 
-  generator.subgenPkg = subgen;
+  generator.subgenPkg = subgen.pkg;
 }
 
 

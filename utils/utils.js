@@ -1,7 +1,7 @@
 'use strict';
 
-var execSync                      = require('child_process').execSync;
 var existsSync                    = require('fs').existsSync;
+var globby                        = require('globby');
 var lodash                        = require('lodash');
 var path                          = require('path');
 var StringDecoder                 = require('string_decoder').StringDecoder;
@@ -50,16 +50,41 @@ function getDecodedAsString(buffer) {
 
 
 /**
- * Invokes npm on the shell to get a list of installed packages.
+ * Returns a list of all depth=0 directory paths inside `searchPaths`.
+ * @param searchPaths   an array of paths to list root dirs (usually from env.getNpmSearchPaths())
  * @returns {*}
  */
-function getInstalledPackages() {
-  try {
-    const results = execSync("npm la --depth=0 --json --silent");
-    return buildSuccess({ results: getDecodedAsJson(results) });
-  } catch (err) {
-    return buildError(err);
-  }
+function getInstalledPkgPaths(searchPaths) {
+  return lodash.flattenDeep(
+    lodash
+      .filter(
+        searchPaths,
+        root => typeof root !== 'undefined' && root !== null
+      ).map(
+        root => globby
+          .sync(['*'], { cwd: root })
+          .map(match => path.join(root, match))
+      )
+  );
+}
+
+
+/**
+ * Returns a list of package info objects based on their local paths.
+ * @param pkgPaths
+ * @returns {*|{}|Array}
+ */
+function populatePkgStoreFromPaths(pkgPaths) {
+  // TODO refactor to ImmutableJS Record
+  return pkgPaths.map(x => {
+    return {
+      path: x,
+      pjson: null,
+      version: null,
+      basename: null,
+      name: null
+    }
+  });
 }
 
 
@@ -74,18 +99,22 @@ function getPkgInfo(pkgName, installed, exact=true) {
 
   const pkg = lodash.find(
     installed, pkg => (exact)
-      ? pkg.name === pkgName
-      : pkg.name.indexOf(pkgName) !== -1
+      ? path.basename(pkg.path) === pkgName
+      : path.basename(pkg.path).indexOf(pkgName) !== -1
   );
 
-  return (pkg !== undefined)
-    ? buildSuccess({
-      path    : pkg.path,
-      name    : pkg.name,
-      version : pkg.version
-    })
-    : buildError(`${pkgName} not found in installed packages.`)
-    ;
+  if (pkg !== undefined) {
+    const pjson = loadPkgJsonFromPkgPath(pkg.path);
+
+    pkg.pjson = pjson;
+    pkg.version = pjson.version;
+    pkg.name = pjson.name;
+
+    return buildSuccess({ pkg: pkg });
+
+  } else {
+    buildError(`${pkgName} not found in installed packages.`);
+  }
 }
 
 
@@ -124,7 +153,7 @@ function getSubgenBaseName(host, patterns, pkgName) {
  */
 function checkActivationState(hostPkg, subgenBaseName) {
   return buildSuccess({
-    result: existsSync(path.join(hostPkg.path, 'extgens', subgenBaseName))
+    result: existsSync(path.join(hostPkg.path, 'generators', subgenBaseName))
   });
 }
 
@@ -138,7 +167,7 @@ function checkActivationState(hostPkg, subgenBaseName) {
  */
 function checkPkgExists(pkgName, installed, exact=true) {
   const regex   = new RegExp( (exact) ? `^${pkgName}$` : pkgName );
-  return lodash.some(installed, dep => regex.exec(dep.name) !== null);
+  return lodash.some(installed, pkg => regex.exec(path.basename(pkg.path)) !== null);
 }
 
 
@@ -155,22 +184,34 @@ function checkPkgExists(pkgName, installed, exact=true) {
 function findExternalSubgens(prefixes, host, installed) {
   var regexps = buildPrefixRegexps(prefixes, host);
 
-  const matches = lodash.filter(installed, dep => {
-    return lodash.some(regexps.filter(regex => regex.exec(dep.name) !== null));
+  const pkgs = lodash.filter(installed, pkg => {
+    return lodash.some(regexps.filter(regex => regex.exec(path.basename(pkg.path)) !== null));
   });
 
   return buildSuccess({
-    results: matches.map(match => {
-      return {
-        'basename' : getSubgenBaseName(host, prefixes, match.name),
-        'name'     : match.name,
-        'path'     : match.path,
-        'version'  : match.version
-      }
+    results: pkgs.map(pkg => {
+      const pjson = loadPkgJsonFromPkgPath(pkg.path);
+
+      pkg.basename = getSubgenBaseName(host, prefixes, pjson.name);
+      pkg.name = pjson.name;
+      pkg.pjson = pjson;
+      pkg.version = pjson.version;
+
+      return pkg;
     })
   });
-
 }
+
+
+/**
+ * Returns package.json from a package's install path
+ * @param dir     base path of the installed package
+ * @returns {*}
+ */
+function loadPkgJsonFromPkgPath(dir) {
+  return require(path.join(dir, 'package.json'));
+}
+
 
 
 /**
@@ -190,6 +231,7 @@ module.exports = {
   checkActivationState,
   checkPkgExists,
   getPkgInfo,
-  getInstalledPackages,
-  findExternalSubgens
+  getInstalledPkgPaths,
+  findExternalSubgens,
+  populatePkgStoreFromPaths
 };
