@@ -55,17 +55,12 @@ function getDecodedAsString(buffer) {
  * @returns {*}
  */
 function getInstalledPkgPaths(searchPaths) {
-  return lodash.flattenDeep(
-    lodash
-      .filter(
-        searchPaths,
-        root => typeof root !== 'undefined' && root !== null
-      ).map(
-        root => globby
-          .sync(['*'], { cwd: root })
-          .map(match => path.join(root, match))
-      )
-  );
+  return searchPaths
+    .filter(root => typeof root !== 'undefined' && root !== null && root !== '')
+    .map(root => globby
+      .sync(['*'], { cwd: root })
+      .map(match => path.join(root, match)))
+    .reduce((prev, curr) => { curr.forEach(x => prev.push(x)); return prev }, []);
 }
 
 
