@@ -8,7 +8,6 @@
 
 const constants                   = require('./constants');
 const Immutable                   = require('immutable');
-const lodash                      = require('lodash');
 const path                        = require('path');
 const utils                       = require('./utils');
 
@@ -145,7 +144,7 @@ function cacheInstalledPackages(generator) {
  * Validates that Yeoman can resolve the host generator.
  */
 function validateHostgenExists(generator) {
-  if (!lodash.some(generator.env.getGeneratorNames(), name => name === generator.hostBaseName)) {
+  if (!generator.env.getGeneratorNames().some(name => name === generator.hostBaseName)) {
     generator.env.error(`Couldn't verify that host generator ${generator.hostFullName} is installed.`);
   }
 }
