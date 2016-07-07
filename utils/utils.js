@@ -2,7 +2,6 @@
 
 var existsSync                    = require('fs').existsSync;
 var globby                        = require('globby');
-var lodash                        = require('lodash');
 var path                          = require('path');
 var StringDecoder                 = require('string_decoder').StringDecoder;
 
@@ -92,8 +91,8 @@ function populatePkgStoreFromPaths(pkgPaths) {
  */
 function getPkgInfo(pkgName, installed, exact=true) {
 
-  const pkg = lodash.find(
-    installed, pkg => (exact)
+  const pkg = installed.find(
+    pkg => (exact)
       ? path.basename(pkg.path) === pkgName
       : path.basename(pkg.path).indexOf(pkgName) !== -1
   );
@@ -162,7 +161,7 @@ function checkActivationState(hostPkg, subgenBaseName) {
  */
 function checkPkgExists(pkgName, installed, exact=true) {
   const regex   = new RegExp( (exact) ? `^${pkgName}$` : pkgName );
-  return lodash.some(installed, pkg => regex.exec(path.basename(pkg.path)) !== null);
+  return installed.some(pkg => regex.exec(path.basename(pkg.path)) !== null);
 }
 
 
@@ -179,9 +178,9 @@ function checkPkgExists(pkgName, installed, exact=true) {
 function findExternalSubgens(prefixes, host, installed) {
   var regexps = buildPrefixRegexps(prefixes, host);
 
-  const pkgs = lodash.filter(installed, pkg => {
-    return lodash.some(regexps.filter(regex => regex.exec(path.basename(pkg.path)) !== null));
-  });
+  const pkgs = installed.filter(pkg =>
+    regexps.some(regexp => regexp.exec(path.basename(pkg.path)) !== null)
+  );
 
   return buildSuccess({
     results: pkgs.map(pkg => {
