@@ -66,6 +66,45 @@ test('subgenext:scan --host yoburger', function(t) {
     });
 });
 
+test('subgenext:scan', function(t) {
+  t.plan(1);
+
+  helpers
+    .run(path.join(__dirname, '../generators/scan'))
+    .withGenerators([path.join(__dirname, '../node_modules/generator-yoburger')])
+    .inTmpDir(function (dir) {
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.subgenext.json'), path.join(dir, 'subgenext.json'));
+      fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
+      fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq/generators/bbq'), path.join(dir, '/node_modules/generator-yoburger/generators/bbq'));
+    })
+    .withArguments(['bbq'])
+    .on('error', function() {
+      t.equal(this.generator.hostBaseName, "wombat", "Cmd falls back to using defaultHost if --host is not provided");
+    });
+});
+
+test('subgenext:scan --host foobar', function(t) {
+  t.plan(1);
+
+  helpers
+    .run(path.join(__dirname, '../generators/scan'))
+    .withGenerators([path.join(__dirname, '../node_modules/generator-yoburger')])
+    .inTmpDir(function (dir) {
+      fs.copySync(path.join(__dirname, '.package.json'), path.join(dir, 'package.json'));
+      fs.copySync(path.join(__dirname, '.subgenext.json'), path.join(dir, 'subgenext.json'));
+      fs.copySync(path.join(__dirname, '../node_modules/generator-yoburger'), path.join(dir, '/node_modules/generator-yoburger'));
+      fs.copySync(path.join(__dirname, '../node_modules/contrib-subgen-yoburger-bbq/generators/bbq'), path.join(dir, '/node_modules/generator-yoburger/generators/bbq'));
+    })
+    .withArguments(['bbq'])
+    .withOptions({
+      host: 'foobar'
+    })
+    .on('error', function() {
+      t.equal(this.generator.hostBaseName, "foobar", "CLI option for --host has priority over defaultHost");
+    });
+});
+
 test('subgenext:activate bbq --host yoburger', function(t) {
   t.plan(2);
 

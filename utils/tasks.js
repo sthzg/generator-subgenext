@@ -113,11 +113,12 @@ function loadSubgenConfig(generator) {
  * Validates input for --host option.
  */
 function validateHostName(generator) {
+
   if (typeof generator.options.host === 'undefined' && !generator.subgenConfig.get('defaultHost', false)) {
     generator.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
   }
 
-  generator.hostBaseName = generator.subgenConfig.get('defaultHost', generator.options.host);
+  generator.hostBaseName = generator.options.host || generator.subgenConfig.get('defaultHost');
   generator.hostFullName = 'generator-' + generator.hostBaseName;
 }
 
