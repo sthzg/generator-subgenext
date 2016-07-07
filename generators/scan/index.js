@@ -54,7 +54,7 @@ class Generator extends generators.Base {
   get end() {
     return {
       output() {
-        this.log.ok(`Found ${this.availableExtgens.length} ${(this.availableExtgens.length === 1) ? 'sub generator' : 'sub generators'}`);
+        this.log.ok(`Found ${this.availableExtgens.count()} ${(this.availableExtgens.count() === 1) ? 'sub generator' : 'sub generators'}`);
         this.log(this.log.table(this.availableExtgens.map((gen, idx) => [
           '',
           idx + 1,

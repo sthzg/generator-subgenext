@@ -40,11 +40,11 @@ describe('subgenext:scan', () => {
     });
 
     it('finds bbq subgen as available extgen', function () {
-      chai(this.generator.availableExtgens.some(x => x.basename === 'bbq'), 'No extgen w/ name bbq found');
+      chai(this.generator.availableExtgens.some(x => x.get('basename') === 'bbq'), 'No extgen w/ name bbq found');
     });
 
     it('reports bbq subgen to be not activated', function () {
-      chai(this.generator.availableExtgens.every(x => x.isActivated === false));
+      chai(this.generator.availableExtgens.every(x => x.get('isActivated') === false));
     });
   });
 
@@ -60,7 +60,7 @@ describe('subgenext:scan', () => {
     });
 
     it('reports bbq subgen to be activated', function () {
-      chai(this.generator.availableExtgens.every(x => x.isActivated === true));
+      chai(this.generator.availableExtgens.every(x => x.get('isActivated') === true));
     });
   });
 

@@ -4,37 +4,25 @@ var existsSync                    = require('fs').existsSync;
 var globby                        = require('globby');
 var path                          = require('path');
 var StringDecoder                 = require('string_decoder').StringDecoder;
-
+var records                       = require('./records.js');
 
 /**
  * Builds a default error object.
  * @param err   string or object providing error information
- * @returns {{hasError: boolean, error: *}}
+ * @returns     Message Record
  */
 function buildError(err = null) {
-  return {
-    hasError : true,
-    error    : err
-  };
+  return records.ErrorMsg({data: err});
 }
 
 
 /**
  * Builds a default success object.
- * @param data    an object that will be merged into the return body.
- * @returns {*}
+ * @param data  an object that will be merged into the return body.
+ * @returns     Message Record
  */
-function buildSuccess(data) {
-  return Object.assign({}, { hasError: false }, data);
-}
-
-
-/**
- * Returns UTF-8 decoded and JSON-parsed representation of `buffer`.
- * @param buffer
- */
-function getDecodedAsJson(buffer) {
-  return JSON.parse(getDecodedAsString(buffer));
+function buildSuccess(data = {}) {
+  return records.SuccessMsg(data);
 }
 
 
@@ -69,15 +57,8 @@ function getInstalledPkgPaths(searchPaths) {
  * @returns {*|{}|Array}
  */
 function populatePkgStoreFromPaths(pkgPaths) {
-  // TODO refactor to ImmutableJS Record
-  return pkgPaths.map(x => {
-    return {
-      path: x,
-      pjson: null,
-      version: null,
-      basename: null,
-      name: null
-    }
+  return pkgPaths.map(path => {
+    return records.HostGenPkg({ path: path });
   });
 }
 
@@ -90,25 +71,25 @@ function populatePkgStoreFromPaths(pkgPaths) {
  * @returns {*}
  */
 function getPkgInfo(pkgName, installed, exact=true) {
-
-  const pkg = installed.find(
+  var pkg = installed.find(
     pkg => (exact)
-      ? path.basename(pkg.path) === pkgName
-      : path.basename(pkg.path).indexOf(pkgName) !== -1
+      ? path.basename(pkg.get('path')) === pkgName
+      : path.basename(pkg.get('path')).indexOf(pkgName) !== -1
   );
 
   if (pkg !== undefined) {
-    const pjson = loadPkgJsonFromPkgPath(pkg.path);
+    const pjson = loadPkgJsonFromPkgPath(pkg.get('path'));
 
-    pkg.pjson = pjson;
-    pkg.version = pjson.version;
-    pkg.name = pjson.name;
+    pkg = pkg.merge({
+      pjson: pjson,
+      version: pjson.version,
+      name: pjson.name
+    });
 
     return buildSuccess({ pkg: pkg });
-
-  } else {
-    buildError(`${pkgName} not found in installed packages.`);
   }
+
+  return buildError(`${pkgName} not found in installed packages.`);
 }
 
 
@@ -146,8 +127,9 @@ function getSubgenBaseName(host, patterns, pkgName) {
  * @returns {*}
  */
 function checkActivationState(hostPkg, subgenBaseName) {
+  const hostPath = hostPkg.get('path');
   return buildSuccess({
-    result: existsSync(path.join(hostPkg.path, 'generators', subgenBaseName))
+    result: existsSync(path.join(hostPath, 'generators', subgenBaseName))
   });
 }
 
@@ -161,7 +143,7 @@ function checkActivationState(hostPkg, subgenBaseName) {
  */
 function checkPkgExists(pkgName, installed, exact=true) {
   const regex   = new RegExp( (exact) ? `^${pkgName}$` : pkgName );
-  return installed.some(pkg => regex.exec(path.basename(pkg.path)) !== null);
+  return installed.some(pkg => regex.exec(path.basename(pkg.get('path'))) !== null);
 }
 
 
@@ -179,19 +161,22 @@ function findExternalSubgens(prefixes, host, installed) {
   var regexps = buildPrefixRegexps(prefixes, host);
 
   const pkgs = installed.filter(pkg =>
-    regexps.some(regexp => regexp.exec(path.basename(pkg.path)) !== null)
+    regexps.some(regexp => regexp.exec(path.basename(pkg.get('path'))) !== null)
   );
 
   return buildSuccess({
     results: pkgs.map(pkg => {
-      const pjson = loadPkgJsonFromPkgPath(pkg.path);
+      const pjson = loadPkgJsonFromPkgPath(pkg.get('path'));
+      var subGenPkg = records.SubGenPkg();
+      var subGenPkg = subGenPkg.merge(pkg);
+      subGenPkg = subGenPkg.merge({
+        basename: getSubgenBaseName(host, prefixes, pjson.name),
+        name: pjson.name,
+        pjson: pjson,
+        version: pjson.version
+      });
 
-      pkg.basename = getSubgenBaseName(host, prefixes, pjson.name);
-      pkg.name = pjson.name;
-      pkg.pjson = pjson;
-      pkg.version = pjson.version;
-
-      return pkg;
+      return subGenPkg;
     })
   });
 }
@@ -205,7 +190,6 @@ function findExternalSubgens(prefixes, host, installed) {
 function loadPkgJsonFromPkgPath(dir) {
   return require(path.join(dir, 'package.json'));
 }
-
 
 
 /**

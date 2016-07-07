@@ -113,12 +113,13 @@ function loadSubgenConfig(generator) {
  * Validates input for --host option.
  */
 function validateHostName(generator) {
+  const defaultHost = generator.subgenConfig.get('defaultHost', false);
 
-  if (typeof generator.options.host === 'undefined' && !generator.subgenConfig.get('defaultHost', false)) {
-    generator.env.error(`Please provide the name of the host generator by appending --host=<generator-name>`);
+  if (typeof generator.options.host === 'undefined' && !defaultHost) {
+    generator.env.error('Please provide the name of the host generator by appending --host=<generator-name>');
   }
 
-  generator.hostBaseName = generator.options.host || generator.subgenConfig.get('defaultHost');
+  generator.hostBaseName = generator.options.host || defaultHost;
   generator.hostFullName = 'generator-' + generator.hostBaseName;
 }
 
@@ -162,7 +163,7 @@ function populateHostgenPkg(generator) {
     generator.env.error(`Couldn't get package info for ${generator.hostFullName} .`);
   }
 
-  generator.hostPkg = pkgQ.pkg;
+  generator.hostPkg = pkgQ.data.get('pkg');
 }
 
 
@@ -186,13 +187,12 @@ function validateSubgenExists(generator) {
  * Scans package for installed subgens.
  */
 function scanForInstalledSubgens(generator) {
-  const extgens = utils.findExternalSubgens(
-    constants.SUBGEN_PREFIX_PATTERNS,
-    generator.hostBaseName,
-    generator.pkgList
-  );
+  const prefix = constants.SUBGEN_PREFIX_PATTERNS;
+  const hostName = generator.hostBaseName;
+  const pkgList = generator.pkgList;
+  const extgens = utils.findExternalSubgens(prefix, hostName, pkgList);
 
-  generator.availableExtgens = extgens.results;
+  generator.availableExtgens = extgens.data.get('results');
 }
 
 
@@ -200,8 +200,12 @@ function scanForInstalledSubgens(generator) {
  * Adds activation state information to the list of availableExtgens external subgens.
  */
 function checkActivationState(generator) {
-  generator.availableExtgens.forEach(subgen => {
-    subgen.isActivated = utils.checkActivationState(generator.hostPkg, subgen.basename).result;
+  const hostPkg = generator.hostPkg
+  generator.availableExtgens = generator.availableExtgens.map((subgen) => {
+    const subgenBaseName = subgen.get('basename');
+    const activationState = utils.checkActivationState(hostPkg, subgenBaseName).data.get('result');
+
+    return subgen.set('isActivated', activationState);
   });
 }
 
@@ -210,32 +214,32 @@ function checkActivationState(generator) {
  * Populates class member with subgen package information.
  * @param generator
  */
-function getSubgenPkg(generator) {
+function setSubgenPkg(generator) {
   const subgen = utils.getPkgInfo(generator.subgenName, generator.availableExtgens, false);
 
   if (subgen.hasError) {
     generator.env.error(`Unable to find package entry fro ${generator.subgenName}. Error: ${subgen.error}`);
   }
 
-  generator.subgenPkg = subgen.pkg;
+  generator.subgenPkg = subgen.data.get('pkg');
 }
 
 
 /**
  * Populates class member with subgen source path.
  */
-function getSubgenSrcPath(generator) {
+function setSubgenSrcPath(generator) {
   const pkg = generator.subgenPkg;
-  generator.subgenSrc = path.join(pkg.path, 'generators', generator.subgenName);
+  generator.subgenSrc = path.join(pkg.get('path'), 'generators', generator.subgenName);
 }
 
 
 /**
  * Populates class member with subgen destination path.
  */
-function getSubgenDestPath(generator) {
+function setSubgenDestPath(generator) {
   const pkg = generator.hostPkg;
-  generator.subgenDest = path.join(pkg.path, 'generators', generator.subgenName);
+  generator.subgenDest = path.join(pkg.get('path'), 'generators', generator.subgenName);
 }
 
 
@@ -250,9 +254,9 @@ function validateCompatibility() {
 module.exports = {
   cacheInstalledPackages,
   checkActivationState,
-  getSubgenDestPath,
-  getSubgenPkg,
-  getSubgenSrcPath,
+  setSubgenDestPath,
+  setSubgenPkg,
+  setSubgenSrcPath,
   injectDefaultConstructor,
   loadSubgenConfig,
   makeSubgenAware,

@@ -53,14 +53,14 @@ class Generator extends generators.Base {
       validateSubgenExists() {
         tasks.validateSubgenExists(this);
       },
-      getSubgenPkg() {
-        tasks.getSubgenPkg(this)
+      setSubgenPkg() {
+        tasks.setSubgenPkg(this)
       },
-      getSubgenSrcPath() {
-        tasks.getSubgenSrcPath(this)
+      setSubgenSrcPath() {
+        tasks.setSubgenSrcPath(this)
       },
-      getSubgenDestPath() {
-        tasks.getSubgenDestPath(this)
+      setSubgenDestPath() {
+        tasks.setSubgenDestPath(this)
       }
     };
   }

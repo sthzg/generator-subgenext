@@ -1,3 +1,7 @@
+
+2016-07-08
+- <@stylesuxx> added immutable Message and Package records
+
 2016-07-07
 - <@sthzg> refactored test runner to Mocha
 - <@sthzg> updated code styling in generator code to become refactoring-friendly
