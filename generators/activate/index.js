@@ -17,26 +17,51 @@ class Generator extends generators.Base {
 
   get initializing() {
     return {
-      loadSubgenConfig                 () { tasks.loadSubgenConfig(this)                 },
-      validateHostName                 () { tasks.validateHostName(this);                },
-      validateSubgenName               () { tasks.validateSubgenName(this);              },
-      cacheInstalledPackages           () { tasks.cacheInstalledPackages(this);          },
-      validateHostgenExists            () { tasks.validateHostgenExists(this);           },
-      populateHostgenPkg               () { tasks.populateHostgenPkg(this);              }
+      loadSubgenConfig() {
+        tasks.loadSubgenConfig(this)
+      },
+      validateHostName() {
+        tasks.validateHostName(this);
+      },
+      validateSubgenName() {
+        tasks.validateSubgenName(this);
+      },
+      cacheInstalledPackages() {
+        tasks.cacheInstalledPackages(this);
+      },
+      validateHostgenExists() {
+        tasks.validateHostgenExists(this);
+      },
+      populateHostgenPkg() {
+        tasks.populateHostgenPkg(this);
+      }
     };
   }
 
 
   get default() {
-
     return {
-      scanForInstalledSubgens          () { tasks.scanForInstalledSubgens(this);         },
-      validateCompatibility            () { tasks.validateCompatibility();               },
-      checkActivationState             () { tasks.checkActivationState(this);            },
-      validateSubgenExists             () { tasks.validateSubgenExists(this);            },
-      getSubgenPkg                     () { tasks.getSubgenPkg(this)                     },
-      getSubgenSrcPath                 () { tasks.getSubgenSrcPath(this)                 },
-      getSubgenDestPath                () { tasks.getSubgenDestPath(this)                }
+      scanForInstalledSubgens() {
+        tasks.scanForInstalledSubgens(this);
+      },
+      validateCompatibility() {
+        tasks.validateCompatibility();
+      },
+      checkActivationState() {
+        tasks.checkActivationState(this);
+      },
+      validateSubgenExists() {
+        tasks.validateSubgenExists(this);
+      },
+      getSubgenPkg() {
+        tasks.getSubgenPkg(this)
+      },
+      getSubgenSrcPath() {
+        tasks.getSubgenSrcPath(this)
+      },
+      getSubgenDestPath() {
+        tasks.getSubgenDestPath(this)
+      }
     };
   }
 

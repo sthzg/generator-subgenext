@@ -1,4 +1,5 @@
 2016-07-07
+- <@sthzg> updated code styling in generator code to become refactoring-friendly
 - <@sthzg> fixed prioritization of CLI option over config value
 
 2016-07-06
