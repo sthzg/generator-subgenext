@@ -28,16 +28,17 @@
     "yeoman-generator": "^0.23.4"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "contrib-subgen-yoburger-bbq": "0.0.2",
     "fs-extra": "^0.30.0",
     "generator-yoburger": "0.0.3",
-    "tape": "^4.6.0",
+    "mocha": "^2.5.3",
     "yeoman-assert": "^2.2.1",
     "yeoman-test": "^1.4.0"
   },
   "scripts": {
-    "test": "node ./tests/index.js",
-    "tape": "tape",
+    "test": "mocha",
+    "test:watch": "mocha -w",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag poc"
