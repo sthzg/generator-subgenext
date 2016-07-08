@@ -2,7 +2,6 @@
 
 const generators                  = require('yeoman-generator');
 const tasks                       = require('../../utils/tasks');
-const utils                       = require('../../utils/utils');
 
 
 class Generator extends generators.Base {
@@ -29,9 +28,6 @@ class Generator extends generators.Base {
       cacheInstalledPackages() {
         tasks.cacheInstalledPackages(this);
       },
-      validateHostgenExists() {
-        tasks.validateHostgenExists(this);
-      },
       populateHostgenPkg() {
         tasks.populateHostgenPkg(this);
       }
@@ -44,17 +40,14 @@ class Generator extends generators.Base {
       scanForInstalledSubgens() {
         tasks.scanForInstalledSubgens(this);
       },
-      validateCompatibility() {
-        tasks.validateCompatibility();
-      },
       checkActivationState() {
         tasks.checkActivationState(this);
       },
-      validateSubgenExists() {
-        tasks.validateSubgenExists(this);
+      populateSubgenPkg() {
+        tasks.populateSubgenPkg(this);
       },
-      setSubgenPkg() {
-        tasks.setSubgenPkg(this)
+      validateCompatibility() {
+        tasks.validateCompatibility(this);
       },
       setSubgenSrcPath() {
         tasks.setSubgenSrcPath(this)

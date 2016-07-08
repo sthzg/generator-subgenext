@@ -1,10 +1,10 @@
 # Yo External Sub Generators
 
 [![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
-[![Build Status](https://travis-ci.org/sthzg/generator-subgenext.svg?branch=develop)](https://travis-ci.org/sthzg/generator-subgenext)
+[![Build Status](https://travis-ci.org/sthzg/generator-subgenext.svg?branch=develop)](https://travis-ci.org/sthzg/generator-subgenext) 
+[![Coverage Status](https://coveralls.io/repos/github/sthzg/generator-subgenext/badge.svg?branch=develop)](https://coveralls.io/github/sthzg/generator-subgenext?branch=develop) 
 [![Dependency Status](https://david-dm.org/sthzg/generator-subgenext.svg)](https://david-dm.org/sthzg/generator-subgenext) 
 [![devDependency Status](https://david-dm.org/sthzg/generator-subgenext/dev-status.svg)](https://david-dm.org/sthzg/generator-subgenext#info=devDependencies)
-[![Coverage Status](https://coveralls.io/repos/github/sthzg/generator-subgenext/badge.svg?branch=develop)](https://coveralls.io/github/sthzg/generator-subgenext?branch=develop)
 
 It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for modularity under one namespace.
 

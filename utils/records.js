@@ -39,12 +39,19 @@ const pkgDefaults = {
   path: null,
   pjson: {},
   isActivated: false, // Only for sub
+  peerDependencies:  {},
   data: {} //only for sub host dep
 };
 
 const Package = immutable.Record(pkgDefaults);
-const HostGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, { isHost: true }));
-const SubGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, { isHost: false }));
+
+const HostGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, {
+  isHost: true
+}));
+
+const SubGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, {
+  isHost: false
+}));
 
 module.exports = {
   SuccessMsg,

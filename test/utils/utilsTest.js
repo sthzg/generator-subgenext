@@ -142,6 +142,36 @@ describe('checkActivationState()', () => {
 });
 
 
+describe('checkPkgExists()', () => {
+  describe('with mocked file system', function () {
+    before(function () {
+      this.prefixes = require('../../utils/constants').SUBGEN_PREFIX_PATTERNS;
+      mockfs(tHelpers.mockedDirsForSearchPaths.structure);
+      const pkgPaths = utils.getInstalledPkgPaths(tHelpers.mockedDirsForSearchPaths.roots);
+      this.store = utils.populatePkgStoreFromPaths(pkgPaths);
+    });
+
+    it('finds packages with exact name', function () {
+      const subgens = utils.findExternalSubgens(this.prefixes, 'sp1dir', this.store).data.get('results');
+      const resQ = utils.checkPkgExists('contrib-subgen-sp1dir-hello', subgens);
+
+      chai.equal(resQ, true);
+    });
+
+    it('finds packages with similar name', function () {
+      const subgens = utils.findExternalSubgens(this.prefixes, 'sp1dir', this.store).data.get('results');
+      const resQ = utils.checkPkgExists('hello', subgens, false);
+
+      chai.equal(resQ, true);
+    });
+
+    after(function () {
+      mockfs.restore();
+    });
+  });
+})
+
+
 describe('findExternalSubgens()', () => {
   describe('with mocked file system', function () {
     before(function () {
@@ -159,5 +189,56 @@ describe('findExternalSubgens()', () => {
     after(function () {
       mockfs.restore();
     });
+  });
+});
+
+/*
+describe('checkHostgenDependency()', () => {
+  describe('with mocked file system', function () {
+    before(function () {
+      this.prefixes = require('../../utils/constants').SUBGEN_PREFIX_PATTERNS;
+      mockfs(tHelpers.mockedDirsForSearchPaths.structure);
+      const pkgPaths = utils.getInstalledPkgPaths(tHelpers.mockedDirsForSearchPaths.roots);
+      this.store = utils.populatePkgStoreFromPaths(pkgPaths);
+    });
+
+    it('finds packages that qualify as external subgens', function () {
+      const resQ = utils.findExternalSubgens(this.prefixes, 'sp1dir', this.store);
+      chai.equal(resQ.data.get('results').size, 2);
+    });
+
+    after(function () {
+      mockfs.restore();
+    });
+  });
+});
+*/
+
+
+describe('sortCharArrByLength()', () => {
+  const arr = ['foo', 'longest', 's', 'bar'];
+  it('sorts descending', function () {
+    const resQ = utils.sortCharArrByLength(arr);
+    chai.equal(resQ[0], 'longest');
+    chai.equal(resQ[3], 's');
+  });
+
+  it('sorts ascending', function () {
+    const resQ = utils.sortCharArrByLength(arr, false);
+    chai.equal(resQ[0], 's');
+    chai.equal(resQ[3], 'longest');
+  });
+});
+
+
+describe('getScanResultTableHeader()', () => {
+  it('formats properly for single subgen', function () {
+    const resQ = utils.getScanResultTableHeader('some-name', '1.2.3', 1);
+    chai.equal(resQ, 'Found 1 sub generator for some-name (1.2.3)');
+  });
+
+  it('formats properly for multiple subgens', function () {
+    const resQ = utils.getScanResultTableHeader('some-name', '1.2.3', 5);
+    chai.equal(resQ, 'Found 5 sub generators for some-name (1.2.3)');
   });
 });

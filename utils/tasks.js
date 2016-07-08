@@ -157,12 +157,8 @@ function validateHostgenExists(generator) {
  * @param generator
  */
 function populateHostgenPkg(generator) {
+  validateHostgenExists(generator);
   const pkgQ = utils.getPkgInfo(generator.hostFullName, generator.pkgList);
-
-  if (pkgQ.hasError) {
-    generator.env.error(`Couldn't get package info for ${generator.hostFullName} .`);
-  }
-
   generator.hostPkg = pkgQ.data.get('pkg');
 }
 
@@ -216,11 +212,6 @@ function checkActivationState(generator) {
  */
 function setSubgenPkg(generator) {
   const subgen = utils.getPkgInfo(generator.subgenName, generator.availableExtgens, false);
-
-  if (subgen.hasError) {
-    generator.env.error(`Unable to find package entry fro ${generator.subgenName}. Error: ${subgen.error}`);
-  }
-
   generator.subgenPkg = subgen.data.get('pkg');
 }
 
@@ -231,6 +222,15 @@ function setSubgenPkg(generator) {
 function setSubgenSrcPath(generator) {
   const pkg = generator.subgenPkg;
   generator.subgenSrc = path.join(pkg.get('path'), 'generators', generator.subgenName);
+}
+
+
+/**
+ * Validates the existence of a subgen and populates it.
+ */
+function populateSubgenPkg(generator) {
+  validateSubgenExists(generator);
+  setSubgenPkg(generator);
 }
 
 
@@ -246,8 +246,18 @@ function setSubgenDestPath(generator) {
 /**
  * Adds information whether found subgens are declared to be compatible with the hostgen version.
  */
-function validateCompatibility() {
-  // TODO validate compatibility between subgen and hostgen.
+function validateCompatibility(generator) {
+  const hostPkg = generator.hostPkg;
+  const subgenPkg = generator.subgenPkg;
+
+  const dependency = utils.checkHostgenDependency(hostPkg, subgenPkg);
+  if(dependency.hasError) {
+    const available = dependency.data.get('err').get('available');
+    const required = dependency.data.get('err').get('required');
+
+    generator.env.error(`Couldn't verify that host generator ${generator.hostFullName} satisfies the sub generators dependency.\nFound ${
+      available}, required ${required}`);
+  }
 }
 
 
@@ -255,16 +265,15 @@ module.exports = {
   cacheInstalledPackages,
   checkActivationState,
   setSubgenDestPath,
-  setSubgenPkg,
   setSubgenSrcPath,
   injectDefaultConstructor,
   loadSubgenConfig,
   makeSubgenAware,
   populateHostgenPkg,
+  populateSubgenPkg,
   scanForInstalledSubgens,
   validateCompatibility,
-  validateHostgenExists,
   validateHostName,
-  validateSubgenExists,
-  validateSubgenName
+  validateSubgenName,
+  validateCompatibility
 };

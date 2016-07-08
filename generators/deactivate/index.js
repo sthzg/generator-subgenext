@@ -29,9 +29,6 @@ class Generator extends generators.Base {
       cacheInstalledPackages() {
         tasks.cacheInstalledPackages(this);
       },
-      validateHostgenExists() {
-        tasks.validateHostgenExists(this);
-      },
       populateHostgenPkg() {
         tasks.populateHostgenPkg(this);
       }
@@ -44,17 +41,11 @@ class Generator extends generators.Base {
       scanForInstalledSubgens() {
         tasks.scanForInstalledSubgens(this);
       },
-      validateCompatibility() {
-        tasks.validateCompatibility();
-      },
       checkActivationState() {
         tasks.checkActivationState(this);
       },
-      validateSubgenExists() {
-        tasks.validateSubgenExists(this);
-      },
-      setSubgenPkg() {
-        tasks.setSubgenPkg(this)
+      populateSubgenPkg() {
+        tasks.populateSubgenPkg(this);
       },
       setSubgenSrcPath() {
         tasks.setSubgenSrcPath(this)

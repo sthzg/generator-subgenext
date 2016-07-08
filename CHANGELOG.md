@@ -4,6 +4,7 @@
 - <@sthzg> added coverage by running npm run test:covarage
 - <@sthzg> added basic set of unit tests for utils.js
 - <@stylesuxx> added immutable Message and Package records
+- <@stylesuxx> added semver checks to list and activate command
 
 2016-07-07
 - <@sthzg> refactored test runner to Mocha

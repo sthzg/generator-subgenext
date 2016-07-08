@@ -3,9 +3,7 @@
 const before                      = require('mocha').before;
 const describe                    = require('mocha').describe;
 const it                          = require('mocha').it;
-const assert                      = require('yeoman-assert');
 const chai                        = require('chai').assert;
-const fs                          = require('fs-extra');
 const helpers                     = require('yeoman-test');
 const path                        = require('path');
 const tHelpers                    = require('../../_helpers');
@@ -45,6 +43,56 @@ describe('subgenext:scan', () => {
 
     it('reports bbq subgen to be not activated', function () {
       chai(this.generator.availableExtgens.every(x => x.get('isActivated') === false));
+    });
+  });
+
+
+  describe('when invoked with --host invalid', function() {
+    before(function (done) {
+      const self = this;
+      helpers
+        .run(tHelpers.genPath('scan'))
+        .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
+        .inTmpDir(function (dir) { tHelpers.moveDefaultFiles(dir); })
+        .withOptions({ host: 'invalid' })
+        .on('error', function(err) { self.generr = err; done() });
+    });
+
+    it('notifies the user w/ an error', function () {
+      chai.equal(
+        this.generr.message,
+        'Couldn\'t verify that host generator generator-invalid is installed.'
+      );
+    });
+  });
+
+
+  describe('when invoked with --host yoburger', function() {
+    before(function (done) {
+      const self = this;
+      helpers
+        .run(tHelpers.genPath('scan'))
+        .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
+        .inTmpDir(function (dir) { tHelpers.moveDefaultFiles(dir); })
+        .withOptions({ host: 'yoburger' })
+        .on('end', function() { self.generator = this.generator; done() });
+    });
+
+    it('finds bbq subgen has host dependency satisfied', function () {
+      const utils = require('../../../utils/utils');
+      const resQ = utils.getScanResultTable(this.generator);
+      const result = resQ[0][4];
+      chai.equal(result, 'Host dependency satisfied: >0.0.0')
+    });
+
+    it('finds bbq subgen has host dependency not satisfied', function () {
+      const utils = require('../../../utils/utils');
+      this.generator.availableExtgens = this.generator.availableExtgens.map((gen) => {
+        return gen.setIn(['peerDependencies', 'generator-yoburger'], '>9000.0.0');
+      });
+
+      const resQ = utils.getScanResultTable(this.generator);
+      chai.equal(resQ[0][4], 'Host dependency failed: >9000.0.0');
     });
   });
 

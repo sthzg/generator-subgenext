@@ -53,4 +53,27 @@ describe('subgenext:activate bbq --host=yoburger', () => {
     });
   });
 
+  describe('when invoked with unresolved subgen dependency', function () {
+    before(function (done) {
+      const self = this;
+      helpers
+        .run(tHelpers.genPath('activate'))
+        .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
+        .inTmpDir(function (dir) {
+          tHelpers.moveDefaultFiles(dir);
+          tHelpers.invalidatePeerDependency(dir);
+        })
+        .withArguments(['bbq'])
+        .withOptions({ host: 'yoburger' })
+        .on('error', function(err) { self.generr = err; done() });
+    });
+
+    it('notifies the user w/ an error', function () {
+      chai.equal(
+        this.generr.message,
+        'Couldn\'t verify that host generator generator-yoburger satisfies the sub generators dependency.\nFound 0.0.3, required >9000.0.0'
+      );
+    });
+  });
+
 });

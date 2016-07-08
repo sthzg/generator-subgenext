@@ -4,7 +4,8 @@ var readFileSync                  = require('fs').readFileSync;
 var existsSync                    = require('fs').existsSync;
 var globby                        = require('globby');
 var path                          = require('path');
-var StringDecoder                 = require('string_decoder').StringDecoder;
+var semver                        = require('semver');
+
 var records                       = require('./records.js');
 
 /**
@@ -13,7 +14,7 @@ var records                       = require('./records.js');
  * @returns     Message Record
  */
 function buildError(err = null) {
-  return records.ErrorMsg({data: err});
+  return records.ErrorMsg(err);
 }
 
 
@@ -24,16 +25,6 @@ function buildError(err = null) {
  */
 function buildSuccess(data = {}) {
   return records.SuccessMsg(data);
-}
-
-
-/**
- * Returns UTF-8 decoded string representation of `buffer`.
- * @param buffer
- */
-function getDecodedAsString(buffer) {
-  var decoder = new StringDecoder('utf-8');
-  return decoder.write(buffer);
 }
 
 
@@ -88,10 +79,9 @@ function getPkgInfo(pkgName, installed, exact=true) {
     });
 
     return buildSuccess({ pkg: pkg });
-
-  } else {
-    return buildError(`${pkgName} not found in installed packages.`);
   }
+
+  return buildError(`${pkgName} not found in installed packages.`);
 }
 
 
@@ -151,6 +141,31 @@ function checkPkgExists(pkgName, installed, exact=true) {
 
 
 /**
+ * Checks if the host dependency of the sub generator is satisfied.
+ * @param hostPkg   Json object of the host package
+ * @param subgenPkg Json object of the subgen package
+ * @returns {boolean}
+ */
+function checkHostgenDependency(hostPkg, subgenPkg) {
+  const hostVersion = hostPkg.version;
+  const hostName = hostPkg.name;
+  const requiredVersion = subgenPkg.get('peerDependencies').get(hostName);
+
+  if (semver.satisfies(hostVersion, requiredVersion)) {
+    return buildSuccess({
+      required: requiredVersion,
+      available: hostVersion
+    });
+  }
+
+  return buildError({
+    required: requiredVersion,
+    available: hostVersion
+  });
+}
+
+
+/**
  * Scans current package for installed subgens.
  *
  * Subgens are installed as regular npm packages and follow a naming convention by which they can be determined.
@@ -176,7 +191,8 @@ function findExternalSubgens(prefixes, host, installed) {
         basename: getSubgenBaseName(host, prefixes, pjson.name),
         name: pjson.name,
         pjson: pjson,
-        version: pjson.version
+        version: pjson.version,
+        peerDependencies: pjson.peerDependencies
       });
 
       return subGenPkg;
@@ -208,13 +224,40 @@ function sortCharArrByLength(arr, desc=true) {
 }
 
 
+function getScanResultTable(generator) {
+  return (generator.availableExtgens.map((gen, idx) => {
+    const id = idx + 1;
+    const name = gen.get('name');
+    const version = gen.get('version');
+    const activated = (gen.get('isActivated')) ? '(activated)' : '(not activated)';
+    const dependency = this.checkHostgenDependency(generator.hostPkg, gen);
+
+    var satisfied = `Host dependency satisfied: ${dependency.data.get('required')}`;
+    if(dependency.hasError) {
+      satisfied= `Host dependency failed: ${dependency.data.get('err').get('required')}`;
+    }
+
+    return ['', id, name, version, satisfied, activated];
+  })).toArray()
+
+}
+
+function getScanResultTableHeader(name, version, count) {
+  return `Found ${count} ${(count === 1) ? 'sub generator' : 'sub generators'} for ${name} (${version})`;
+}
+
+
 module.exports = {
   buildPrefixRegexps,
   checkActivationState,
   checkPkgExists,
+  checkHostgenDependency,
   getPkgInfo,
   getInstalledPkgPaths,
+  getScanResultTable,
+  getScanResultTableHeader,
   getSubgenBaseName,
   findExternalSubgens,
-  populatePkgStoreFromPaths
+  populatePkgStoreFromPaths,
+  sortCharArrByLength
 };

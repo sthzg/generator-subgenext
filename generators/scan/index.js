@@ -26,9 +26,6 @@ class Generator extends generators.Base {
       cacheInstalledPackages() {
         tasks.cacheInstalledPackages(this);
       },
-      validateHostgenExists() {
-        tasks.validateHostgenExists(this);
-      },
       populateHostgenPkg() {
         tasks.populateHostgenPkg(this);
       }
@@ -41,9 +38,6 @@ class Generator extends generators.Base {
       scanForInstalledSubgens() {
         tasks.scanForInstalledSubgens(this);
       },
-      validateCompatibility() {
-        tasks.validateCompatibility();
-      },
       checkActivationState() {
         tasks.checkActivationState(this);
       }
@@ -54,13 +48,13 @@ class Generator extends generators.Base {
   get end() {
     return {
       output() {
-        this.log.ok(`Found ${this.availableExtgens.count()} ${(this.availableExtgens.count() === 1) ? 'sub generator' : 'sub generators'}`);
-        this.log(this.log.table(this.availableExtgens.map((gen, idx) => [
-          '',
-          idx + 1,
-          gen.name,
-          (gen.isActivated) ? '(activated)' : '(not activated)'
-        ])));
+        const hostName = this.hostPkg.name;
+        const hostVersion = this.hostPkg.version;
+        const table = utils.getScanResultTable(this);
+        const tableHeader = utils.getScanResultTableHeader(hostName, hostVersion, table.length);
+
+        this.log.ok(tableHeader);
+        this.log(this.log.table(table));
       }
     }
 

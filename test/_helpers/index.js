@@ -11,6 +11,12 @@ function genPath(gen) {
   return path.join(__dirname, '../../generators', gen);
 }
 
+function invalidatePeerDependency(dir) {
+  const packagePath = path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq/package.json');
+  var content = fs.readFileSync(packagePath).toString();
+  content = content.replace(/"generator-yoburger": ">0.0.0"/g, '"generator-yoburger": ">9000.0.0"');
+  fs.writeFileSync(packagePath, content);
+}
 
 function moveDefaultFiles(dir, includeSubgenextJson = false, includeExtgen = false) {
   fs.copySync(
@@ -81,5 +87,6 @@ module.exports = {
   nodeModDir,
   resourcesDir,
   mockedDirsForSearchPaths,
+  invalidatePeerDependency,
   moveDefaultFiles
 };
