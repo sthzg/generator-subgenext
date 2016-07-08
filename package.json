@@ -43,7 +43,7 @@
   "scripts": {
     "test": "mocha",
     "test:watch": "mocha -w",
-    "test:coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly && rm -rf ./coverage",
+    "test:cover": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report html --report text",
     "test:travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
