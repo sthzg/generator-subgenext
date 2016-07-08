@@ -1,6 +1,7 @@
 
 2016-07-08
 - <@sthzg> added coveralls integration
+- <@sthzg> refactored activate/deactivate to symlink/unlink
 - <@sthzg> added coverage by running npm run test:covarage
 - <@sthzg> added basic set of unit tests for utils.js
 - <@stylesuxx> added immutable Message and Package records

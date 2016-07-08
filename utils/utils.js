@@ -253,7 +253,9 @@ function getScanResultTableHeader(name, version, count) {
 
 
 module.exports = {
+  buildError,
   buildPrefixRegexps,
+  buildSuccess,
   checkActivationState,
   checkPkgExists,
   checkHostgenDependency,

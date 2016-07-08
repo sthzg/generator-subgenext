@@ -1,7 +1,11 @@
 'use strict';
 
+const fs                          = require('fs');
 const generators                  = require('yeoman-generator');
+
 const tasks                       = require('../../utils/tasks');
+
+
 
 
 class Generator extends generators.Base {
@@ -12,7 +16,6 @@ class Generator extends generators.Base {
     tasks.injectDefaultConstructor(this);
     tasks.makeSubgenAware(this);
   }
-
 
   get initializing() {
     return {
@@ -33,7 +36,6 @@ class Generator extends generators.Base {
       }
     };
   }
-
 
   get default() {
     return {
@@ -58,28 +60,25 @@ class Generator extends generators.Base {
     };
   }
 
-
   get writing() {
     return {
-
-      /**
-       * Copies the subgen to the host generator's directory.
-       */
-      copySubgen() {
-        this.fs.copy(this.subgenSrc, this.subgenDest);
+      activateSubgen() {
+        tasks.activateSubgen(this);
       }
-
     }
   }
 
   get end() {
     return {
       output() {
-        this.log.ok(`Activated ${this.subgenName}!`);
+        if (this.genData.activation.get('hasError')) {
+          this.log.error(this.genData.activation.getIn(['data', 'err', 'data']));
+        } else {
+          this.log.ok(`Activated ${this.subgenName}!`);
+        }
       }
     }
   }
-
 }
 
 module.exports = Generator;

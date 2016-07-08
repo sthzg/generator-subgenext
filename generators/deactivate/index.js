@@ -1,7 +1,8 @@
 'use strict';
 
+var existsSync                    = require('fs').existsSync;
+const fs                          = require('fs');
 const generators                  = require('yeoman-generator');
-const rimraf                      = require('rimraf');
 const tasks                       = require('../../utils/tasks');
 
 
@@ -13,7 +14,6 @@ class Generator extends generators.Base {
     tasks.injectDefaultConstructor(this);
     tasks.makeSubgenAware(this);
   }
-
 
   get initializing() {
     return {
@@ -35,7 +35,6 @@ class Generator extends generators.Base {
     };
   }
 
-
   get default() {
     return {
       scanForInstalledSubgens() {
@@ -56,28 +55,25 @@ class Generator extends generators.Base {
     };
   }
 
-
   get writing() {
     return {
-
-      /**
-       * Removes the subgen from the hostgen directory.
-       */
-      deleteSubgen() {
-        rimraf.sync(this.subgenDest);
+      deactivateSubgen() {
+        tasks.deactivateSubgen(this);
       }
-
     }
   }
 
   get end() {
     return {
       output() {
-        this.log.ok(`Deactivated ${this.subgenName}!`);
+        if (this.genData.deactivation.get('hasError')) {
+          this.log.error(this.genData.deactivation.getIn(['data', 'err', 'data']));
+        } else {
+          this.log.ok(`Deactivated ${this.subgenName}!`);
+        }
       }
     }
   }
-
 }
 
 module.exports = Generator;

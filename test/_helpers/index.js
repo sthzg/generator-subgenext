@@ -40,7 +40,7 @@ function moveDefaultFiles(dir, includeSubgenextJson = false, includeExtgen = fal
   }
 
   if (includeExtgen) {
-    fs.copySync(
+    fs.symlinkSync(
       path.join(nodeModDir, 'contrib-subgen-yoburger-bbq/generators/bbq'),
       path.join(dir, '/node_modules/generator-yoburger/generators/bbq')
     );

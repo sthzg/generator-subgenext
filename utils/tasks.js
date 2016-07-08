@@ -6,8 +6,10 @@
 
 'use strict';
 
-const constants                   = require('./constants');
+const fs                          = require('fs');
 const Immutable                   = require('immutable');
+
+const constants                   = require('./constants');
 const path                        = require('path');
 const utils                       = require('./utils');
 
@@ -23,6 +25,13 @@ function injectDefaultConstructor(generator) {
    * @type {Array}
    */
   generator.availableExtgens = [];
+
+  /**
+   * Free to use message object on the generator.
+   * Generators may use this pojo to store arbitrary data on the generator (e.g. to pass data to another priority).
+   * @type {{}}
+   */
+  generator.genData = {};
 
   /**
    * Basename of the host generator.
@@ -45,7 +54,6 @@ function injectDefaultConstructor(generator) {
   /**
    * Json representation of all installed packages in depth=0
    * We cache this value in a variable since invoking the shell command is expensive and slow.
-   *
    * @type {?Json}
    */
   generator.pkgList = null;
@@ -99,6 +107,37 @@ function makeSubgenAware(generator) {
     type: String,
     required: true
   });
+}
+
+
+/**
+ * Activates an external subgen by linking inside the hostgen.
+ * @param generator
+ */
+function activateSubgen(generator) {
+  if (!fs.existsSync(generator.subgenDest)) {
+    fs.symlinkSync(generator.subgenSrc, generator.subgenDest);
+    generator.genData.activation = utils.buildSuccess({});
+  } else {
+    const err = `Subgen with name "${generator.subgenName}" is already activated. If you want to update it, make sure 
+                 to deactivate it first. This is a NOOP`;
+    generator.genData.activation = utils.buildError(err);
+  }
+}
+
+
+/**
+ * Activates an external subgen by unlinking it from the hostgen.
+ * @param generator
+ */
+function deactivateSubgen(generator) {
+  if (fs.existsSync(generator.subgenDest)) {
+    fs.unlinkSync(generator.subgenDest);
+    generator.genData.deactivation = utils.buildSuccess({});
+  } else {
+    const err = `Subgen with name "${generator.subgenName}" doesn't seem to be activated. This is a NOOP.`;
+    generator.genData.deactivation = utils.buildError(err);
+  }
 }
 
 
@@ -262,8 +301,10 @@ function validateCompatibility(generator) {
 
 
 module.exports = {
+  activateSubgen,
   cacheInstalledPackages,
   checkActivationState,
+  deactivateSubgen,
   setSubgenDestPath,
   setSubgenSrcPath,
   injectDefaultConstructor,
