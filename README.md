@@ -1,4 +1,4 @@
-# Yo External Sub Generators – RFC
+# Yo External Sub Generators
 
 [![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
 [![Build Status](https://travis-ci.org/sthzg/generator-subgenext.svg?branch=develop)](https://travis-ci.org/sthzg/generator-subgenext)
