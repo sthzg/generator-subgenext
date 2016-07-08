@@ -72,7 +72,11 @@ const mockedDirsForSearchPaths = {
       },
       'sp2dir3': {},
     },
-    '/tmp/searchPath3': {}
+    '/tmp/searchPath3': {  // on purpose to check uniqueness and FIFO logic for subgen resolving
+      'contrib-subgen-sp1dir-hello': {
+        'package.json': JSON.stringify(buildPkgJson('hello'))
+      }
+    }
   },
   roots: [
     '/tmp/searchPath1',

@@ -35,7 +35,7 @@ function buildSuccess(data = {}) {
  */
 function getInstalledPkgPaths(searchPaths) {
   return searchPaths
-  // don't act on nonsensical data
+    // don't act on nonsensical data
     .filter(root => typeof root !== 'undefined' && root !== null && root !== '')
     // collect first level directory in all directories
     .map(root => globby
@@ -181,24 +181,26 @@ function checkHostgenDependency(hostPkg, subgenPkg) {
 function findExternalSubgens(prefixes, host, installed) {
   var regexps = buildPrefixRegexps(prefixes, host);
 
-  const pkgs = installed.filter(pkg =>
-    regexps.some(regexp => regexp.exec(path.basename(pkg.get('path'))) !== null)
-  );
+  const bname = (x) => path.basename(x.get('path'));
+
+  const pkgs = installed
+    // Filter all packages that don't match a subgen naming pattern
+    .filter(pkg => regexps.some(regexp => regexp.exec(bname(pkg)) !== null))
+    // Only add the first match of each node package (FIFO)
+    .reduce((prev, curr) => { if (prev.every(x => bname(x) !== bname(curr))) { prev.push(curr); } return prev; }, []);
 
   return buildSuccess({
     results: pkgs.map(pkg => {
       const pjson = loadPkgJsonFromPkgPath(pkg.get('path'));
-      var subGenPkg = records.SubGenPkg();
-      var subGenPkg = subGenPkg.merge(pkg);
-      subGenPkg = subGenPkg.merge({
-        basename: getSubgenBaseName(host, prefixes, pjson.name),
-        name: pjson.name,
-        pjson: pjson,
-        version: pjson.version,
-        peerDependencies: pjson.peerDependencies
-      });
-
-      return subGenPkg;
+      return records.SubGenPkg()
+        .merge(pkg)
+        .merge({
+          basename: getSubgenBaseName(host, prefixes, pjson.name),
+          name: pjson.name,
+          pjson: pjson,
+          version: pjson.version,
+          peerDependencies: pjson.peerDependencies
+        });
     })
   });
 }

@@ -21,7 +21,7 @@ describe('getInstalledPkgPaths()', () => {
 
     it('returns expected number of directories from the fs', function () {
       const res = utils.getInstalledPkgPaths(tHelpers.mockedDirsForSearchPaths.roots);
-      chai.isOk(res.length === 6, 'Expected number of dirs to be 6')
+      chai.isOk(res.length === 7, 'Expected number of dirs to be 6')
     });
 
     after(function() {
@@ -40,7 +40,7 @@ describe('populatePkgStoreFromPaths()', () => {
 
     it('returns expected number of directories from the fs', function () {
       const res = utils.populatePkgStoreFromPaths(this.pkgPaths);
-      chai.isOk(res.length === 6, 'Expected number of entries to be 6');
+      chai.isOk(res.length === 7, 'Expected number of entries to be 6');
       chai.isOk(
         res.every(x => typeof x.path === 'string' && x.path !== ''),
         'Expected all items to have a non-empty path prop'
