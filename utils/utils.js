@@ -35,11 +35,14 @@ function buildSuccess(data = {}) {
  */
 function getInstalledPkgPaths(searchPaths) {
   return searchPaths
+  // don't act on nonsensical data
     .filter(root => typeof root !== 'undefined' && root !== null && root !== '')
+    // collect first level directory in all directories
     .map(root => globby
       .sync(['*'], { cwd: root })
       .map(match => path.join(root, match)))
-    .reduce((prev, curr) => { curr.forEach(x => prev.push(x)); return prev }, []);
+    // flatten and only store unique values
+    .reduce((prev, curr) => { curr.forEach(x => { if (prev.indexOf(x) === -1) { prev.push(x) } }); return prev }, []);
 }
 
 

@@ -77,7 +77,8 @@ const mockedDirsForSearchPaths = {
   roots: [
     '/tmp/searchPath1',
     '/tmp/searchPath2',
-    '/tmp/searchPath3'
+    '/tmp/searchPath3',
+    '/tmp/searchPath1',  // on purpose to check for uniqueness
   ]
 };
 
