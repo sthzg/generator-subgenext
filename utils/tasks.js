@@ -315,6 +315,5 @@ module.exports = {
   scanForInstalledSubgens,
   validateCompatibility,
   validateHostName,
-  validateSubgenName,
-  validateCompatibility
+  validateSubgenName
 };
