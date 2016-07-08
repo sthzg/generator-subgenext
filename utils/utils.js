@@ -56,6 +56,23 @@ function populatePkgStoreFromPaths(pkgPaths) {
 
 
 /**
+ * Returns packages info for `pkgName` if found in `installed`.
+ * @param pkgName   name of the package to query info for
+ * @param installed Json object of installed npm packages
+ * @returns [{*}]
+ */
+function getPkgsInfo(pkgName, installed) {
+  return buildSuccess({
+    pkgs: [installed.reduce(function(pkg) {
+      if(path.basename(pkg.get('path')).indexOf(pkgName) !== -1) {
+        return pkg;
+      }
+    })]
+  });
+}
+
+
+/**
  * Returns package info for `pkgName` if found in `installed`.
  * @param pkgName   name of the package to query info for
  * @param installed Json object of installed npm packages
@@ -188,6 +205,7 @@ function findExternalSubgens(prefixes, host, installed) {
       var subGenPkg = records.SubGenPkg();
       var subGenPkg = subGenPkg.merge(pkg);
       subGenPkg = subGenPkg.merge({
+        isHost: false,
         basename: getSubgenBaseName(host, prefixes, pjson.name),
         name: pjson.name,
         pjson: pjson,
@@ -253,6 +271,7 @@ module.exports = {
   checkPkgExists,
   checkHostgenDependency,
   getPkgInfo,
+  getPkgsInfo,
   getInstalledPkgPaths,
   getScanResultTable,
   getScanResultTableHeader,
