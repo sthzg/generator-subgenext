@@ -6,11 +6,19 @@
 [![devDependency Status](https://david-dm.org/sthzg/generator-subgenext/dev-status.svg)](https://david-dm.org/sthzg/generator-subgenext#info=devDependencies)
 [![Coverage Status](https://coveralls.io/repos/github/sthzg/generator-subgenext/badge.svg?branch=develop)](https://coveralls.io/github/sthzg/generator-subgenext?branch=develop)
 
-It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for modularity under one namespace (unless I failed to realize an important concept about it).
+It is often desirable to add custom sub generators (subgens) to an existing generator. Currently, you have the option to compose your own generator with others, but stacking generators on top of each other doesn't allow for modularity under one namespace.
 
-> Feature and implementation can be seen as two independent aspects. Maybe the proposed feature in general is useful but the implementation is poor or, less likely, the other way around ;)
+### Feature vs. Implementation
 
-- Wiki: [The Fully Integrated Happy Path](https://github.com/sthzg/generator-subgenext/wiki/The-Fully-Integrated-Happy-Path) probably describes the cleanest way
+Feature and implementation can be seen as two independent aspects. Maybe the proposed feature in general is useful but the implementation is poor or, less likely, the other way around ;)
+
+We put a writeup of three approaches to achieve the goal to the [Wiki Home](https://github.com/sthzg/generator-subgenext/wiki), and [The Fully Integrated Happy Path](https://github.com/sthzg/generator-subgenext/wiki/The-Fully-Integrated-Happy-Path) describes what probably would be the nicest way to go. 
+
+However, since we wanted to showcase this idea with a proof-of-concept that works without anyone (users or gen-authors) to change anything, we start by implementing it in a way that doesn't require changes to Yo core repositories or existing generators. 
+
+**The rest of the readme deals w/ describing the current approach, [https://github.com/sthzg/generator-subgenext/wiki/How-to-Setup-a-Manual-Playground](https://github.com/sthzg/generator-subgenext/wiki/How-to-Setup-a-Manual-Playground) shows how to setup the status quo on your local machine.**
+
+### Motivation
 
 **Modularity**
 
@@ -30,7 +38,7 @@ I provide a generator operating on a large and multifaceted domain. It becomes o
 
 I am working on experimental features of a generator that should already be accessible to early adopters, but are a) not ready to be merged into core or b) may still be denied adoption at all.
 
-**Organization**
+### Structure
 
 ```
 node_modules/
@@ -59,7 +67,7 @@ Legend
 `(2)` and `(3)` are separate npm packages where the `subgen` and `contrib-subgen` prefixes are a naming convention. Activating _currently_ injects the subgens into the host gen's `generators` directory (at later stages there will hopefully be a more elegant approach without actually moving files).
 
 
-**User interface**
+### User Interface
 
 ```sh
 npm i -g generator-subgenext  # or optionally install it locally
@@ -93,7 +101,9 @@ yo subgenext:deactivate foo
 
 The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve of the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli/env and thus, provide seamless integration. (e.g. `yo subgenext scan`, etc.).
 
-##subgenext.json##
+### Configuration
+
+**subgenext.json**
 
 You can add a `subgenext.json` file to the root dir of you project to add external configuration.
 
@@ -108,12 +118,9 @@ You can add a `subgenext.json` file to the root dir of you project to add extern
 }
 ```
 
-##Caveats##
 
-* The current way this generator looks up packages requires the host generator to be a (peer)dependency and all installed subgens to be (dev)dependencies in your `package.json`. There should be enough room for improvements.
-* Initial development in this `proof-of-concept` branch works with locally installed generators. At a later stage I'd like to inspect if and what is necessary to respect globally installed generators as well.
+### Testing
 
-##Testing##
 To invoke the test suite run:
 
 ```sh
