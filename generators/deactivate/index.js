@@ -67,7 +67,7 @@ class Generator extends generators.Base {
     return {
       output() {
         if (this.genData.deactivation.get('hasError')) {
-          this.log.error(this.genData.deactivation.getIn(['data', 'err', 'data']));
+          this.log.error(this.genData.deactivation.getIn(['data', 'err']));
         } else {
           this.log.ok(`Deactivated ${this.subgenName}!`);
         }

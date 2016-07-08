@@ -119,8 +119,8 @@ function activateSubgen(generator) {
     fs.symlinkSync(generator.subgenSrc, generator.subgenDest);
     generator.genData.activation = utils.buildSuccess({});
   } else {
-    const err = `Subgen with name "${generator.subgenName}" is already activated. If you want to update it, make sure 
-                 to deactivate it first. This is a NOOP`;
+    const err = 'Subgen with name ' + generator.subgenName + ' is already activated. If you want to update it, make ' +
+      'sure to deactivate it first. This is a NOOP.';
     generator.genData.activation = utils.buildError(err);
   }
 }

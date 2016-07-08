@@ -72,7 +72,7 @@ class Generator extends generators.Base {
     return {
       output() {
         if (this.genData.activation.get('hasError')) {
-          this.log.error(this.genData.activation.getIn(['data', 'err', 'data']));
+          this.log.error(this.genData.activation.getIn(['data', 'err']));
         } else {
           this.log.ok(`Activated ${this.subgenName}!`);
         }
