@@ -30,15 +30,21 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "contrib-subgen-yoburger-bbq": "0.0.2",
+    "coveralls": "^2.11.9",
     "fs-extra": "^0.30.0",
     "generator-yoburger": "0.0.3",
+    "istanbul": "^0.4.4",
     "mocha": "^2.5.3",
+    "mocha-lcov-reporter": "^1.2.0",
+    "mock-fs": "^3.9.0",
     "yeoman-assert": "^2.2.1",
     "yeoman-test": "^1.4.0"
   },
   "scripts": {
     "test": "mocha",
     "test:watch": "mocha -w",
+    "test:coverage": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly && rm -rf ./coverage",
+    "test:travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
     "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag poc"

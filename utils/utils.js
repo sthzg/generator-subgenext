@@ -1,5 +1,6 @@
 'use strict';
 
+var readFileSync                  = require('fs').readFileSync;
 var existsSync                    = require('fs').existsSync;
 var globby                        = require('globby');
 var path                          = require('path');
@@ -87,9 +88,10 @@ function getPkgInfo(pkgName, installed, exact=true) {
     });
 
     return buildSuccess({ pkg: pkg });
-  }
 
-  return buildError(`${pkgName} not found in installed packages.`);
+  } else {
+    return buildError(`${pkgName} not found in installed packages.`);
+  }
 }
 
 
@@ -112,6 +114,7 @@ function buildPrefixRegexps(patterns, host) {
  * @returns {string|void|XML|*}
  */
 function getSubgenBaseName(host, patterns, pkgName) {
+  // TODO gh_issue 13, return Success or Error record
   const sorted  = sortCharArrByLength(patterns);
   const regexps = buildPrefixRegexps(sorted, host);
   const prefix  = regexps.find(regex => regex.exec(pkgName) !== null);
@@ -188,7 +191,7 @@ function findExternalSubgens(prefixes, host, installed) {
  * @returns {*}
  */
 function loadPkgJsonFromPkgPath(dir) {
-  return require(path.join(dir, 'package.json'));
+  return JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'));
 }
 
 
@@ -206,10 +209,12 @@ function sortCharArrByLength(arr, desc=true) {
 
 
 module.exports = {
+  buildPrefixRegexps,
   checkActivationState,
   checkPkgExists,
   getPkgInfo,
   getInstalledPkgPaths,
+  getSubgenBaseName,
   findExternalSubgens,
   populatePkgStoreFromPaths
 };

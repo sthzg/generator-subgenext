@@ -42,9 +42,44 @@ function moveDefaultFiles(dir, includeSubgenextJson = false, includeExtgen = fal
 }
 
 
+const buildPkgJson = (name='', version='1.0.0') => { return {name, version} };
+
+
+const mockedDirsForSearchPaths = {
+  structure: {
+    '/tmp/searchPath1': {
+      'sp1dir1': {
+        'generators': {
+          'hello': {}
+        },
+        'package.json': JSON.stringify(buildPkgJson('sp1dir1', '1.0.0'))
+      },
+      'sp1dir2': {},
+      'sp1dir3': {}
+    },
+    '/tmp/searchPath2': {
+      'contrib-subgen-sp1dir-hello': {
+        'package.json': JSON.stringify(buildPkgJson('hello'))
+      },
+      'contrib-subgen-sp1dir-bye': {
+        'package.json': JSON.stringify(buildPkgJson('bye'))
+      },
+      'sp2dir3': {},
+    },
+    '/tmp/searchPath3': {}
+  },
+  roots: [
+    '/tmp/searchPath1',
+    '/tmp/searchPath2',
+    '/tmp/searchPath3'
+  ]
+};
+
+
 module.exports = {
   genPath,
   nodeModDir,
   resourcesDir,
+  mockedDirsForSearchPaths,
   moveDefaultFiles
 };
