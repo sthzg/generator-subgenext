@@ -205,7 +205,7 @@ function validateSubgenExists(generator) {
         return [text, '"', basename, '" or '].join('');
       }
 
-      return [text, basename, '", '].join('');
+      return [text, '"', basename, '", '].join('');
     }, '');
 
     generator.env.error(`Couldn't verify that subgen "${subgenName}" is installed. Did you mean ${possibleText}?`);
