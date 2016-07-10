@@ -62,12 +62,16 @@ function populatePkgStoreFromPaths(pkgPaths) {
  * @returns [{*}]
  */
 function getPkgsInfo(pkgName, installed) {
+  const pkgs = installed.reduce(function(packages, pkg) {
+    if(path.basename(pkg.get('path')).indexOf(pkgName) !== -1) {
+      return packages.concat(pkg);
+    }
+
+    return packages;
+  }, []);
+
   return buildSuccess({
-    pkgs: [installed.reduce(function(pkg) {
-      if(path.basename(pkg.get('path')).indexOf(pkgName) !== -1) {
-        return pkg;
-      }
-    })]
+    pkgs: pkgs
   });
 }
 
