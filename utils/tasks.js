@@ -173,22 +173,21 @@ function populateHostgenPkg(generator) {
  * @depends
  */
 function validateSubgenExists(generator) {
+  const hostgenBasename = generator.hostBaseName;
   const extgens = generator.availableExtgens;
   var subgenName = generator.subgenName;
+
+  // Check for exact match
+  const uniqueName = ['contrib-subgen', hostgenBasename, subgenName].join('-');
+  const unique = !utils.getPkgInfo(uniqueName, extgens).hasError;
+  if(unique) {
+    return;
+  }
 
   // Get all matching packages - make sure at least one matches.
   const possible = utils.getPkgsInfo(subgenName, extgens).data.get('pkgs');
   if (possible.count() < 1) {
     generator.env.error(`Couldn't verify that subgen "${subgenName}" is installed.`);
-  }
-
-  // One package matches, make sure it has the exact base name.
-  if (possible.count() === 1) {
-    const pkg = possible.get(0);
-    const basename = pkg.get('basename');
-    if (generator.subgenName !== basename) {
-      generator.env.error(`Couldn't verify that subgen "${subgenName}" is installed. Did you mean "${basename}"?`);
-    }
   }
 
   // Multiple packages match
