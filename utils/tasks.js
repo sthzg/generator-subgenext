@@ -166,15 +166,49 @@ function populateHostgenPkg(generator) {
 /**
  * Validates that the required sub generator exists in the installed packages.
  *
+ * Error when not verified that subgen is installed.
+ * Error when multiple installed subgens are matched.
+ * Error when single installed subgens matches, but not exactly.
+ *
  * @depends
  */
 function validateSubgenExists(generator) {
-  // TODO Fix ambiguity problems with subgen validation check.
-  // Currently all we do is matching `subgenName` as a substring, which has two problems:
-  // 1. ambiguous when multiple subgens share a token, e.g. subgen-helloworld, subgen-helloworld-evening
-  // 2. ambiguous on vendor and contrib subgens with same name (e.g. subgen-controller and contrib-subgen-controller)
-  if (!utils.checkPkgExists(generator.subgenName, generator.availableExtgens, false)) {
-    generator.env.error(`Couldn't verify that subgen ${generator.subgenName} is installed.`);
+  const extgens = generator.availableExtgens;
+  var subgenName = generator.subgenName;
+
+  // Get all matching packages - make sure at least one matches.
+  const possible = utils.getPkgsInfo(subgenName, extgens).data.get('pkgs');
+  if (possible.count() < 1) {
+    generator.env.error(`Couldn't verify that subgen "${subgenName}" is installed.`);
+  }
+
+  // One package matches, make sure it has the exact base name.
+  if (possible.count() === 1) {
+    const pkg = possible.get(0);
+    const basename = pkg.get('basename');
+    if (generator.subgenName !== basename) {
+      generator.env.error(`Couldn't verify that subgen "${subgenName}" is installed. Did you mean "${basename}"?`);
+    }
+  }
+
+  // Multiple packages match
+  else {
+    const possibleText = possible.reduce(function(text, pkg, index, pkgs) {
+      const length = pkgs.count() - 1;
+      const basename = pkg.get('basename');
+
+      if(index === length) {
+        return [text, '"', basename, '"'].join('');
+      }
+
+      if(index === (length - 1)) {
+        return [text, '"', basename, '" or '].join('');
+      }
+
+      return [text, basename, '", '].join('');
+    }, '');
+
+    generator.env.error(`Couldn't verify that subgen "${subgenName}" is installed. Did you mean ${possibleText}?`);
   }
 }
 
