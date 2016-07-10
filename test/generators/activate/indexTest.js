@@ -78,3 +78,47 @@ describe('subgenext:activate nonExistent --host=yoburger', () => {
     );
   });
 });
+
+describe('subgenext:activate bb --host=yoburger', () => {
+  before(function (done) {
+    const self = this;
+    helpers
+      .run(tHelpers.genPath('activate'))
+      .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
+      .inTmpDir(function (dir) {
+        tHelpers.moveDefaultFiles(dir);
+      })
+      .withArguments(['bb'])
+      .withOptions({ host: 'yoburger' })
+      .on('error', function(err) { self.generr = err; done() });
+  });
+
+  it('notifies the user w/ an error', function () {
+    chai.equal(
+      this.generr.message,
+      'Couldn\'t verify that subgen "bb" is installed. Did you mean "bbq"?'
+    );
+  });
+});
+
+describe('subgenext:activate b --host=yoburger', () => {
+  before(function (done) {
+    const self = this;
+    helpers
+      .run(tHelpers.genPath('activate'))
+      .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
+      .inTmpDir(function (dir) {
+        tHelpers.moveDefaultFiles(dir);
+      })
+      .withArguments(['b'])
+      .withOptions({ host: 'yoburger' })
+      .on('error', function(err) { self.generr = err; done() });
+  });
+
+  it('notifies the user w/ an error', function () {
+    chai.equal(
+      this.generr.message,
+      'Couldn\'t verify that subgen "b" is installed. Did you mean "bbq", "beer" or "cucumber"?'
+    );
+  });
+});
