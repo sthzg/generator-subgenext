@@ -47,8 +47,8 @@ describe('subgenext:activate bbq --host=yoburger', () => {
     it('notifies the user w/ an error', function () {
       chai.equal(
         this.generr.message,
-        `Couldn't verify that subgen nonExistent is installed.`,
-        `Doesn't notify user w/ expected error output`
+        'Couldn\'t verify that subgen "nonExistent" is installed.',
+        'Doesn\'t notify user w/ expected error output'
       );
     });
   });

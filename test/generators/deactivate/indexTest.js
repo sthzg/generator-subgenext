@@ -5,7 +5,6 @@ const describe                    = require('mocha').describe;
 const it                          = require('mocha').it;
 const assert                      = require('yeoman-assert');
 const chai                        = require('chai').assert;
-const fs                          = require('fs-extra');
 const helpers                     = require('yeoman-test');
 const path                        = require('path');
 const tHelpers                    = require('../../_helpers');
@@ -47,8 +46,8 @@ describe('subgenext:deactivate bbq --host=yoburger', () => {
     it('notifies the user w/ an error', function () {
       chai.equal(
         this.generr.message,
-        `Couldn't verify that subgen nonExistent is installed.`,
-        `Doesn't notify user w/ expected error output`
+        'Couldn\'t verify that subgen "nonExistent" is installed.',
+        'Doesn\'t notify user w/ expected error output'
       );
     });
   });

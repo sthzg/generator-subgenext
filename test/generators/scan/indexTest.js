@@ -108,7 +108,7 @@ describe('subgenext:scan', () => {
     });
 
     it('reports bbq subgen to be activated', function () {
-      chai(this.generator.availableExtgens.every(x => x.get('isActivated') === true));
+      chai(this.generator.availableExtgens.some(x => x.get('isActivated') === true));
     });
   });
 
