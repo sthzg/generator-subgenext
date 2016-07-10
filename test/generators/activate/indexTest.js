@@ -32,27 +32,6 @@ describe('subgenext:activate bbq --host=yoburger', () => {
     });
   });
 
-  describe('when invoked with non-existing subgen', function () {
-    before(function (done) {
-      const self = this;
-      helpers
-        .run(tHelpers.genPath('activate'))
-        .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
-        .inTmpDir(function (dir) { tHelpers.moveDefaultFiles(dir); })
-        .withArguments(['nonExistent'])
-        .withOptions({ host: 'yoburger' })
-        .on('error', function(err) { self.generr = err; done() });
-    });
-
-    it('notifies the user w/ an error', function () {
-      chai.equal(
-        this.generr.message,
-        'Couldn\'t verify that subgen "nonExistent" is installed.',
-        'Doesn\'t notify user w/ expected error output'
-      );
-    });
-  });
-
   describe('when invoked with unresolved subgen dependency', function () {
     before(function (done) {
       const self = this;
@@ -76,4 +55,26 @@ describe('subgenext:activate bbq --host=yoburger', () => {
     });
   });
 
+});
+
+describe('subgenext:activate nonExistent --host=yoburger', () => {
+  before(function (done) {
+    const self = this;
+    helpers
+      .run(tHelpers.genPath('activate'))
+      .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
+      .inTmpDir(function (dir) {
+        tHelpers.moveDefaultFiles(dir);
+      })
+      .withArguments(['nonExistent'])
+      .withOptions({ host: 'yoburger' })
+      .on('error', function(err) { self.generr = err; done() });
+  });
+
+  it('notifies the user w/ an error', function () {
+    chai.equal(
+      this.generr.message,
+      'Couldn\'t verify that subgen "nonExistent" is installed.'
+    );
+  });
 });
