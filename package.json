@@ -32,6 +32,7 @@
     "chai": "^3.5.0",
     "contrib-subgen-yoburger-bbq": "0.0.3",
     "contrib-subgen-yoburger-beer": "0.0.1",
+    "contrib-subgen-yoburger-cucumber": "0.0.1",
     "coveralls": "^2.11.9",
     "fs-extra": "^0.30.0",
     "generator-yoburger": "0.0.3",
