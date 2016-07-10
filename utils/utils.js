@@ -62,9 +62,14 @@ function populatePkgStoreFromPaths(pkgPaths) {
  * @returns [{*}]
  */
 function getPkgsInfo(pkgName, installed) {
+  var basenames = [];
   const pkgs = installed.reduce(function(packages, pkg) {
     if(path.basename(pkg.get('path')).indexOf(pkgName) !== -1) {
-      return packages.concat(pkg);
+      const basename = pkg.get('basename');
+      if(!basenames.includes(basename)) {
+        basenames.push(basename);
+        return packages.concat(pkg);
+      }
     }
 
     return packages;
