@@ -206,6 +206,11 @@ function findExternalSubgens(prefixes, host, installed) {
 }
 
 
+function shouldAutoConfirmYesnos(bool) {
+  return bool || false;
+}
+
+
 /**
  * Returns package.json from a package's install path
  * @param dir     base path of the installed package
@@ -266,5 +271,6 @@ module.exports = {
   getSubgenBaseName,
   findExternalSubgens,
   populatePkgStoreFromPaths,
+  shouldAutoConfirmYesnos,
   sortCharArrByLength
 };

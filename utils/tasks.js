@@ -66,8 +66,12 @@ function injectDefaultConstructor(generator) {
 
   generator.option('host', {
     desc: 'Name of the host generator',
-    type: 'String',
-    required: true
+    type: 'String'
+  });
+
+  generator.option('yes', {
+    desc: 'Confirm all yesnos with yes',
+    type: 'Boolean'
   });
 
 }
@@ -116,8 +120,34 @@ function makeSubgenAware(generator) {
  */
 function activateSubgen(generator) {
   if (!fs.existsSync(generator.subgenDest)) {
-    fs.symlinkSync(generator.subgenSrc, generator.subgenDest);
-    generator.genData.activation = utils.buildSuccess({});
+    var done = generator.async();
+
+    const run = (shouldProceed) => {
+
+      if (!shouldProceed) {
+        generator.env.error('Operation cancelled by user.');
+        done();
+      }
+
+      fs.symlinkSync(generator.subgenSrc, generator.subgenDest);
+      generator.genData.activation = utils.buildSuccess({});
+
+      done();
+    };
+
+    if (utils.shouldAutoConfirmYesnos(generator.options.yes)) {
+      run(true);
+    } else {
+      generator.prompt({
+        type: 'confirm',
+        name: 'proceed',
+        message: `I will create a symlink\nfrom =>\t${generator.subgenSrc}\nin =>\t${generator.subgenDest}\nConfirm to proceed:`
+      })
+      .then(
+        answers => run(answers.proceed)
+      );
+    }
+
   } else {
     const err = 'Subgen with name ' + generator.subgenName + ' is already activated. If you want to update it, make ' +
       'sure to deactivate it first. This is a NOOP.';
@@ -132,8 +162,33 @@ function activateSubgen(generator) {
  */
 function deactivateSubgen(generator) {
   if (fs.existsSync(generator.subgenDest)) {
-    fs.unlinkSync(generator.subgenDest);
-    generator.genData.deactivation = utils.buildSuccess({});
+    var done = generator.async();
+
+    const run = (shouldProceed) => {
+
+      if (!shouldProceed) {
+        generator.env.error('Operation cancelled by user.');
+        done();
+      }
+
+      fs.unlinkSync(generator.subgenDest);
+      generator.genData.deactivation = utils.buildSuccess({});
+
+      done();
+    };
+
+    if (utils.shouldAutoConfirmYesnos(generator.options.yes)) {
+      run(true);
+    } else {
+      generator.prompt({
+        type: 'confirm',
+        name: 'proceed',
+        message: `I will remove this symlink\n=> ${generator.subgenDest}\nConfirm to proceed:`
+      })
+        .then(
+          answers => run(answers.proceed)
+        );
+    }
   } else {
     const err = `Subgen with name "${generator.subgenName}" doesn't seem to be activated. This is a NOOP.`;
     generator.genData.deactivation = utils.buildError(err);
