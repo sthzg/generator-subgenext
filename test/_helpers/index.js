@@ -34,8 +34,8 @@ function moveDefaultFiles(dir, includeSubgenextJson = false, includeExtgen = fal
 
   if (includeSubgenextJson) {
     fs.copySync(
-      path.join(resourcesDir, '.subgenext.json'),
-      path.join(dir, 'subgenext.json')
+      path.join(resourcesDir, '.yo-rc.json'),
+      path.join(dir, '.yo-rc.json')
     );
   }
 

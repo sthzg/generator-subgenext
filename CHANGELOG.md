@@ -1,3 +1,6 @@
+2016-08-06
+- <@sthzg> refactored subgen config to .yo-rc.json
+- <@sthzg> added confirmation prompts before file operations in activate and deactivate
 
 2016-07-08
 - <@sthzg> added coveralls integration

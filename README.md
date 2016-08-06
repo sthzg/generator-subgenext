@@ -103,9 +103,9 @@ The drafted user interface achieves logic through a separate generator (`generat
 
 ### Configuration
 
-**subgenext.json**
+**Configuration**
 
-You can add a `subgenext.json` file to the root dir of you project to add external configuration.
+You can add subgen configuration in your [`.yo-rc.json`](http://yeoman.io/authoring/storage.html).
 
 **Supported config props**
 
@@ -114,7 +114,9 @@ You can add a `subgenext.json` file to the root dir of you project to add extern
 
 ```json
 {
-  "defaultHost": "x"
+  "generator-subgenext": {
+    "defaultHost": "foobar"
+  }
 }
 ```
 

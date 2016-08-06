@@ -196,11 +196,12 @@ function deactivateSubgen(generator) {
 }
 
 
+/**
+ * Saves an immutable version of the subgenerator configuration in {@code generator.subgenConfig}.
+ * @param {Object} generator
+ */
 function loadSubgenConfig(generator) {
-  const cfgPath = path.join(generator.env.cwd, 'subgenext.json');
-  if (generator.fs.exists(cfgPath)) {
-    generator.subgenConfig = generator.subgenConfig.mergeDeep(Immutable.fromJS(require(cfgPath)));
-  }
+  generator.subgenConfig = Immutable.fromJS(generator.config.getAll());
 }
 
 /**
