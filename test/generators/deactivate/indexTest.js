@@ -19,7 +19,7 @@ describe('subgenext:deactivate bbq --host=yoburger', () => {
         .run(tHelpers.genPath('deactivate'))
         .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
         .inTmpDir(function (dir) {
-          tHelpers.moveDefaultFiles(dir, false, true);
+          tHelpers.moveDefaultFiles(dir, false, false);
         })
         .withArguments(['bbq'])
         .withOptions({ host: 'yoburger' })

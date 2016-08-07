@@ -60,7 +60,7 @@ describe('subgenext:activate bbq --host=yoburger', () => {
         .run(tHelpers.genPath('activate'))
         .withGenerators([path.join(tHelpers.nodeModDir, 'generator-yoburger')])
         .inTmpDir(function (dir) {
-          tHelpers.moveDefaultFiles(dir);
+          tHelpers.moveDefaultFiles(dir, false);
           tHelpers.invalidatePeerDependency(dir);
         })
         .withArguments(['bbq'])

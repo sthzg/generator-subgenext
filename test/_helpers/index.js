@@ -18,7 +18,7 @@ function invalidatePeerDependency(dir) {
   fs.writeFileSync(packagePath, content);
 }
 
-function moveDefaultFiles(dir, includeSubgenextJson = false, includeExtgen = false) {
+function moveDefaultFiles(dir, includeYoRc = false, includeExtgen = false) {
   fs.copySync(
     path.join(resourcesDir, '.package.json'),
     path.join(dir, 'package.json')
@@ -32,7 +32,7 @@ function moveDefaultFiles(dir, includeSubgenextJson = false, includeExtgen = fal
     path.join(dir, '/node_modules/contrib-subgen-yoburger-bbq')
   );
 
-  if (includeSubgenextJson) {
+  if (includeYoRc) {
     fs.copySync(
       path.join(resourcesDir, '.yo-rc.json'),
       path.join(dir, '.yo-rc.json')
