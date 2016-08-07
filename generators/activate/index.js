@@ -51,6 +51,9 @@ class Generator extends generators.Base {
       validateCompatibility() {
         tasks.validateCompatibility(this);
       },
+      setSubgenNamespace() {
+        tasks.setSubgenNamespace(this);
+      },
       setSubgenSrcPath() {
         tasks.setSubgenSrcPath(this)
       },

@@ -6,7 +6,7 @@
 
 'use strict';
 
-const fs                          = require('fs');
+const fs                          = require('fs-extra');
 const Immutable                   = require('immutable');
 
 const constants                   = require('./constants');
@@ -59,7 +59,7 @@ function injectDefaultConstructor(generator) {
   generator.pkgList = null;
 
   /**
-   * Map with configuration data for subgenext (loaded from subgenext.json if exists)
+   * Map with configuration data for subgenext (loaded from .yo-rc.json if exists)
    * @type {Immutable.Map}
    */
   generator.subgenConfig = Immutable.Map();
@@ -88,6 +88,12 @@ function makeSubgenAware(generator) {
    * @type {?String}
    */
   generator.subgenName = null;
+
+  /**
+   * A namespace that generators of this subgen should be placed under.
+   * @type {string}
+   */
+  generator.subgenNamespace = '';
 
   /**
    * Package entry from npm list as Json.
@@ -129,6 +135,10 @@ function activateSubgen(generator) {
         done();
       }
 
+      if (!fs.existsSync(path.dirname(generator.subgenDest))) {
+        fs.mkdirpSync(path.dirname(generator.subgenDest));
+      }
+
       fs.symlinkSync(generator.subgenSrc, generator.subgenDest);
       generator.genData.activation = utils.buildSuccess({});
 
@@ -161,6 +171,7 @@ function activateSubgen(generator) {
  * @param generator
  */
 function deactivateSubgen(generator) {
+  // TODO if subgen is installed in namespace and no other subgen is in that namespace, delete namespace dir.
   if (fs.existsSync(generator.subgenDest)) {
     var done = generator.async();
 
@@ -291,10 +302,11 @@ function scanForInstalledSubgens(generator) {
  * Adds activation state information to the list of availableExtgens external subgens.
  */
 function checkActivationState(generator) {
-  const hostPkg = generator.hostPkg
+  const hostPkg = generator.hostPkg;
   generator.availableExtgens = generator.availableExtgens.map((subgen) => {
     const subgenBaseName = subgen.get('basename');
-    const activationState = utils.checkActivationState(hostPkg, subgenBaseName).data.get('result');
+    const subgenNamespace = subgen.getIn(['authorCfg', 'namespace'], '');
+    const activationState = utils.checkActivationState(hostPkg, subgenBaseName, subgenNamespace).data.get('result');
 
     return subgen.set('isActivated', activationState);
   });
@@ -334,7 +346,22 @@ function populateSubgenPkg(generator) {
  */
 function setSubgenDestPath(generator) {
   const pkg = generator.hostPkg;
-  generator.subgenDest = path.join(pkg.get('path'), 'generators', generator.subgenName);
+  generator.subgenDest =
+    path.join(
+      pkg.get('path'),
+      'generators',
+      `${utils.buildSubgenNamespaceWithSeparator(generator.subgenNamespace)}${generator.subgenName}`
+    );
+}
+
+
+/**
+ * Populates class member with subgen namespace.
+ * @param generator
+ */
+function setSubgenNamespace(generator) {
+  const pkg = generator.subgenPkg;
+  generator.subgenNamespace = pkg.authorCfg.get('namespace', '');
 }
 
 
@@ -363,6 +390,7 @@ module.exports = {
   deactivateSubgen,
   setSubgenDestPath,
   setSubgenSrcPath,
+  setSubgenNamespace,
   injectDefaultConstructor,
   loadSubgenConfig,
   makeSubgenAware,

@@ -101,7 +101,7 @@ yo subgenext:deactivate foo
 
 The drafted user interface achieves logic through a separate generator (`generator-subgenext`). It is proposed since it doesn't demand Yeoman's maintainers to approve of the idea but can be developed to a stable state individually. If, however, the idea sounds interesting it could also be implemented into the yo cli/env and thus, provide seamless integration. (e.g. `yo subgenext scan`, etc.).
 
-### Configuration
+### User Configuration
 
 **Configuration**
 
@@ -119,6 +119,22 @@ You can add subgen configuration in your [`.yo-rc.json`](http://yeoman.io/author
   }
 }
 ```
+
+### Authoring Configuration
+
+Extgen authors can add a value for `generator-subgenext` into the 
+extgen's `package.json`. Values inside this object will be considered 
+for certain, supported authoring based config values.
+
+**Supported config props**
+
+`namespace`  
+  A string added in namespace will be prepended while activating the extgen. 
+  This is helpful when you want to group subgens provided by your package 
+  under a namespace. If your package provides a subgen named `container` 
+  and your `namespace` is set to `addons`, the activated subgen will 
+  become available as `yo host_gen:addons-container`.
+
 
 
 ### Testing

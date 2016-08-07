@@ -3,6 +3,8 @@
 var readFileSync                  = require('fs').readFileSync;
 var existsSync                    = require('fs').existsSync;
 var globby                        = require('globby');
+var Immutable                     = require('immutable');
+var Map                           = require('immutable').Map;
 var path                          = require('path');
 var semver                        = require('semver');
 
@@ -10,6 +12,7 @@ var records                       = require('./records.js');
 
 /**
  * Builds a default error object.
+ *
  * @param err   string or object providing error information
  * @returns     Message Record
  */
@@ -20,6 +23,7 @@ function buildError(err = null) {
 
 /**
  * Builds a default success object.
+ *
  * @param data  an object that will be merged into the return body.
  * @returns     Message Record
  */
@@ -27,9 +31,21 @@ function buildSuccess(data = {}) {
   return records.SuccessMsg(data);
 }
 
+/**
+ * Returns the namespace with appended {@code sep} if {@code subgenNamespace} is not empty.
+ *
+ * @param {String} subgenNamespace
+ * @param {String} sep
+ * @return {string}
+ */
+function buildSubgenNamespaceWithSeparator(subgenNamespace, sep = '-') {
+  return (subgenNamespace === '') ? '' : subgenNamespace + sep;
+}
+
 
 /**
  * Returns a list of all depth=0 directory paths inside `searchPaths`.
+ *
  * @param searchPaths   an array of paths to list root dirs (usually from env.getNpmSearchPaths())
  * @returns {*}
  */
@@ -48,6 +64,7 @@ function getInstalledPkgPaths(searchPaths) {
 
 /**
  * Returns a list of package info objects based on their local paths.
+ *
  * @param pkgPaths
  * @returns {*|{}|Array}
  */
@@ -60,13 +77,14 @@ function populatePkgStoreFromPaths(pkgPaths) {
 
 /**
  * Returns package info for `pkgName` if found in `installed`.
+ *
  * @param pkgName   name of the package to query info for
- * @param installed Json object of installed npm packages
+ * @param haystack  list of npm packages to search for {@code pkgName}
  * @param exact     flag indicating whether match has to be exact, defaults to true
  * @returns {*}
  */
-function getPkgInfo(pkgName, installed, exact=true) {
-  var pkg = installed.find(
+function getPkgInfo(pkgName, haystack, exact=true) {
+  var pkg = haystack.find(
     pkg => (exact)
       ? path.basename(pkg.get('path')) === pkgName
       : path.basename(pkg.get('path')).indexOf(pkgName) !== -1
@@ -90,6 +108,7 @@ function getPkgInfo(pkgName, installed, exact=true) {
 
 /**
  * Returns an array of regexp instances for external subgen naming patterns.
+ *
  * @param patterns    array of string patterns
  * @param host        name of the host generator
  * @returns {Iterable<K, RegExp>|*|Array|{}}
@@ -101,6 +120,7 @@ function buildPrefixRegexps(patterns, host) {
 
 /**
  * Returns the basename of a subgen (i.e the name without the package prefixes).
+ *
  * @param host        name of the host generator
  * @param patterns    array of string patterns
  * @param pkgName     name of the package to infer the basename from
@@ -118,20 +138,23 @@ function getSubgenBaseName(host, patterns, pkgName) {
 
 /**
  * Returns whether `subgen` is activated on the host generator.
- * @param hostPkg           package object for host generator
- * @param subgenBaseName    basename for subgen
- * @returns {*}
+ *
+ * @param {Object} hostPkg     package object for host generator
+ * @param {String} basename    basename for subgen
+ * @param {String} namespace   basename for subgen
+ * @returns {String}
  */
-function checkActivationState(hostPkg, subgenBaseName) {
+function checkActivationState(hostPkg, basename, namespace = '') {
   const hostPath = hostPkg.get('path');
   return buildSuccess({
-    result: existsSync(path.join(hostPath, 'generators', subgenBaseName))
+    result: existsSync(path.join(hostPath, 'generators', `${buildSubgenNamespaceWithSeparator(namespace)}${basename}`))
   });
 }
 
 
 /**
  * Checks if `pkgName` exists in installed npm packages.
+ *
  * @param pkgName   name of the package to query info for
  * @param installed Json object of installed npm packages
  * @param exact     flag indicating whether `pkgName` needs to match exactly
@@ -145,6 +168,7 @@ function checkPkgExists(pkgName, installed, exact=true) {
 
 /**
  * Checks if the host dependency of the sub generator is satisfied.
+ *
  * @param hostPkg   Json object of the host package
  * @param subgenPkg Json object of the subgen package
  * @returns {boolean}
@@ -192,12 +216,19 @@ function findExternalSubgens(prefixes, host, installed) {
   return buildSuccess({
     results: pkgs.map(pkg => {
       const pjson = loadPkgJsonFromPkgPath(pkg.get('path'));
+
+      const authorCfg = typeof pjson["generator-subgenext"] === 'undefined'
+        ? new Map()
+        : Immutable.fromJS(pjson["generator-subgenext"])
+        ;
+
       return records.SubGenPkg()
         .merge(pkg)
         .merge({
+          authorCfg,
+          pjson,
           basename: getSubgenBaseName(host, prefixes, pjson.name),
           name: pjson.name,
-          pjson: pjson,
           version: pjson.version,
           peerDependencies: pjson.peerDependencies
         });
@@ -206,6 +237,12 @@ function findExternalSubgens(prefixes, host, installed) {
 }
 
 
+/**
+ * Returns indicator whether yesno prompts should be automatically confirmed.
+ *
+ * @param {boolean} bool
+ * @return {boolean}
+ */
 function shouldAutoConfirmYesnos(bool) {
   return bool || false;
 }
@@ -213,6 +250,7 @@ function shouldAutoConfirmYesnos(bool) {
 
 /**
  * Returns package.json from a package's install path
+ *
  * @param dir     base path of the installed package
  * @returns {*}
  */
@@ -223,6 +261,7 @@ function loadPkgJsonFromPkgPath(dir) {
 
 /**
  * Sorts strings inside `arr` based on char length.
+ *
  * @param arr     array to sort
  * @param desc    flag that indicates whether to sort in descending or ascending order
  * @returns {Array.<T>|*|Iterable<K, V>}
@@ -260,6 +299,7 @@ function getScanResultTableHeader(name, version, count) {
 module.exports = {
   buildError,
   buildPrefixRegexps,
+  buildSubgenNamespaceWithSeparator,
   buildSuccess,
   checkActivationState,
   checkPkgExists,

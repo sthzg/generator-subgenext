@@ -46,6 +46,9 @@ class Generator extends generators.Base {
       populateSubgenPkg() {
         tasks.populateSubgenPkg(this);
       },
+      setSubgenNamespace() {
+        tasks.setSubgenNamespace(this);
+      },
       setSubgenSrcPath() {
         tasks.setSubgenSrcPath(this)
       },

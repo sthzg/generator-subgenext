@@ -1,3 +1,6 @@
+2016-08-07
+- <@sthzg> extgen author's can now specify a namespace in their package.json
+
 2016-08-06
 - <@sthzg> refactored subgen config to .yo-rc.json
 - <@sthzg> added confirmation prompts before file operations in activate and deactivate
