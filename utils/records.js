@@ -12,7 +12,7 @@ const Immutable                     = require('immutable');
 /**
  * @private Base record used to build more concrete message classes like {@link SuccessMsg} and {@link ErrorMsg}.
  */
-class Message extends Immutable.Record({ hasError: false, data: {} }) {
+class Msg extends Immutable.Record({ hasError: false, data: {} }) {
   constructor(data) {
     data.data = Immutable.fromJS(data.data, function (key, value) {
       var isIndexed = Immutable.Iterable.isIndexed(value);
@@ -29,7 +29,7 @@ class Message extends Immutable.Record({ hasError: false, data: {} }) {
  *
  * @param {Object} data
  */
-const SuccessMsg = (data) => new Message({
+const SuccessMsg = (data) => new Msg({
   data: data
 });
 
@@ -39,7 +39,7 @@ const SuccessMsg = (data) => new Message({
  *
  * @param {Object} err
  */
-const ErrorMsg = (err) => new Message({
+const ErrorMsg = (err) => new Msg({
   hasError: true,
   data: {
     err: err
@@ -61,7 +61,7 @@ const pkgDefaults = {
 };
 
 
-const Package = Immutable.Record(pkgDefaults);
+const Pkg = Immutable.Record(pkgDefaults);
 
 
 /**
@@ -69,7 +69,7 @@ const Package = Immutable.Record(pkgDefaults);
  *
  * @param {Object} pkg
  */
-const HostGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, {
+const HostGenPkg = (pkg={}) => Pkg(Object.assign({}, pkgDefaults, pkg, {
   isHost: true
 }));
 
@@ -79,7 +79,7 @@ const HostGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, {
  *
  * @param {Object} pkg
  */
-const SubGenPkg = (pkg={}) => Package(Object.assign({}, pkgDefaults, pkg, {
+const SubGenPkg = (pkg={}) => Pkg(Object.assign({}, pkgDefaults, pkg, {
   isHost: false
 }));
 

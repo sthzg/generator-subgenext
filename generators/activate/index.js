@@ -29,7 +29,7 @@ class Generator extends generators.Base {
         tasks.validateSubgenName(this);
       },
       cacheInstalledPackages() {
-        tasks.cacheInstalledPackages(this);
+        tasks.cacheInstalledPkgs(this);
       },
       populateHostgenPkg() {
         tasks.populateHostgenPkg(this);

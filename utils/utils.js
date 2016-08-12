@@ -14,7 +14,7 @@ var records                       = require('./records.js');
  * Builds a default error object.
  *
  * @param err   string or object providing error information
- * @returns     Message Record
+ * @returns     Msg Record
  */
 function buildError(err = null) {
   return records.ErrorMsg(err);
@@ -25,7 +25,7 @@ function buildError(err = null) {
  * Builds a default success object.
  *
  * @param data  an object that will be merged into the return body.
- * @returns     Message Record
+ * @returns     Msg Record
  */
 function buildSuccess(data = {}) {
   return records.SuccessMsg(data);

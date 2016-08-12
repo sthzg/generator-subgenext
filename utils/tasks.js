@@ -241,7 +241,7 @@ function validateSubgenName(generator) {
 /**
  * Caches root paths to installed npm packages into class member.
  */
-function cacheInstalledPackages(generator) {
+function cacheInstalledPkgs(generator) {
   generator.pkgList = utils.populatePkgStoreFromPaths(
     utils.getInstalledPkgPaths(generator.env.getNpmPaths())
   );
@@ -385,7 +385,7 @@ function validateCompatibility(generator) {
 
 module.exports = {
   activateSubgen,
-  cacheInstalledPackages,
+  cacheInstalledPkgs,
   checkActivationState,
   deactivateSubgen,
   setSubgenDestPath,
