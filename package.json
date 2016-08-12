@@ -1,6 +1,6 @@
 {
   "name": "generator-subgenext",
-  "version": "0.0.1-1",
+  "version": "0.0.0",
   "description": "Add custom sub generators to a Yeoman host generator",
   "main": "generators/app/index.js",
   "files": [
@@ -14,7 +14,17 @@
     "type": "git",
     "url": "git+https://github.com/sthzg/generator-subgenext.git"
   },
-  "author": "@sthzg",
+  "author": {
+    "name": "Stephan Herzog",
+    "email": "sthzgvie@gmail.com",
+    "url": "https://github.com/sthzg"
+  },
+  "contributors": [
+    {
+      "name": "Chris Landa",
+      "email": "stylesuxx@gmail.com"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sthzg/generator-subgenext/issues"
@@ -46,8 +56,8 @@
     "test:watch": "mocha -w",
     "test:cover": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report html --report text",
     "test:travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
-    "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
-    "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag poc",
-    "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag poc"
+    "release:major": "npm version major && npm publish && git push --follow-tags",
+    "release:minor": "npm version minor && npm publish && git push --follow-tags",
+    "release:patch": "npm version patch && npm publish && git push --follow-tags"
   }
 }
