@@ -1,5 +1,6 @@
 # generator-subgenext
 
+[![npm version](https://badge.fury.io/js/generator-subgenext.svg)](https://badge.fury.io/js/generator-subgenext)
 [![Gitter](https://badges.gitter.im/sthzg/generator-subgenext.svg)](https://gitter.im/sthzg/generator-subgenext?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
 [![Build Status](https://travis-ci.org/sthzg/generator-subgenext.svg?branch=develop)](https://travis-ci.org/sthzg/generator-subgenext) 
 [![Coverage Status](https://coveralls.io/repos/github/sthzg/generator-subgenext/badge.svg?branch=develop)](https://coveralls.io/github/sthzg/generator-subgenext?branch=develop) 
