@@ -5,7 +5,9 @@ var tasks                         = require('../../utils/tasks');
 var utils                         = require('../../utils/utils');
 
 
-
+/**
+ * Scan npm path for available sub generators and output availability and activation status.
+ */
 class Generator extends generators.Base {
 
   constructor(...args) {
@@ -14,52 +16,27 @@ class Generator extends generators.Base {
     tasks.injectDefaultConstructor(this);
   }
 
-
-  get initializing() {
-    return {
-      loadSubgenConfig() {
-        tasks.loadSubgenConfig(this)
-      },
-      validateHostName() {
-        tasks.validateHostName(this);
-      },
-      cacheInstalledPackages() {
-        tasks.cacheInstalledPkgs(this);
-      },
-      populateHostgenPkg() {
-        tasks.populateHostgenPkg(this);
-      }
-    };
+  initializing() {
+    tasks.loadSubgenConfig(this);
+    tasks.validateHostName(this);
+    tasks.cacheInstalledPkgs(this);
+    tasks.populateHostgenPkg(this);
   }
 
-
-  get default() {
-    return {
-      scanForInstalledSubgens() {
-        tasks.scanForInstalledSubgens(this);
-      },
-      checkActivationState() {
-        tasks.checkActivationState(this);
-      }
-    };
+  defaultTasks() {
+    tasks.scanForInstalledSubgens(this);
+    tasks.checkActivationState(this);
   }
 
+  end() {
+    const hostName = this.hostPkg.name;
+    const hostVersion = this.hostPkg.version;
+    const table = utils.getScanResultTable(this);
+    const tableHeader = utils.getScanResultTableHeader(hostName, hostVersion, table.length);
 
-  get end() {
-    return {
-      output() {
-        const hostName = this.hostPkg.name;
-        const hostVersion = this.hostPkg.version;
-        const table = utils.getScanResultTable(this);
-        const tableHeader = utils.getScanResultTableHeader(hostName, hostVersion, table.length);
-
-        this.log.ok(tableHeader);
-        this.log(this.log.table(table));
-      }
-    }
-
+    this.log.ok(tableHeader);
+    this.log(this.log.table(table));
   }
-
 }
 
 

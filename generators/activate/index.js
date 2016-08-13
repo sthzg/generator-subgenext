@@ -1,13 +1,12 @@
 'use strict';
 
-const fs                          = require('fs');
 const generators                  = require('yeoman-generator');
-
 const tasks                       = require('../../utils/tasks');
 
 
-
-
+/**
+ * Activates an external subgenerator.
+ */
 class Generator extends generators.Base {
 
   constructor(...args) {
@@ -17,69 +16,33 @@ class Generator extends generators.Base {
     tasks.makeSubgenAware(this);
   }
 
-  get initializing() {
-    return {
-      loadSubgenConfig() {
-        tasks.loadSubgenConfig(this)
-      },
-      validateHostName() {
-        tasks.validateHostName(this);
-      },
-      validateSubgenName() {
-        tasks.validateSubgenName(this);
-      },
-      cacheInstalledPackages() {
-        tasks.cacheInstalledPkgs(this);
-      },
-      populateHostgenPkg() {
-        tasks.populateHostgenPkg(this);
-      }
-    };
+  initializing() {
+    tasks.loadSubgenConfig(this);
+    tasks.validateHostName(this);
+    tasks.validateSubgenName(this);
+    tasks.cacheInstalledPkgs(this);
+    tasks.populateHostgenPkg(this);
   }
 
-  get default() {
-    return {
-      scanForInstalledSubgens() {
-        tasks.scanForInstalledSubgens(this);
-      },
-      checkActivationState() {
-        tasks.checkActivationState(this);
-      },
-      populateSubgenPkg() {
-        tasks.populateSubgenPkg(this);
-      },
-      validateCompatibility() {
-        tasks.validateCompatibility(this);
-      },
-      setSubgenNamespace() {
-        tasks.setSubgenNamespace(this);
-      },
-      setSubgenSrcPath() {
-        tasks.setSubgenSrcPath(this)
-      },
-      setSubgenDestPath() {
-        tasks.setSubgenDestPath(this)
-      }
-    };
+  defaultTasks() {
+    tasks.scanForInstalledSubgens(this);
+    tasks.checkActivationState(this);
+    tasks.populateSubgenPkg(this);
+    tasks.validateCompatibility(this);
+    tasks.setSubgenNamespace(this);
+    tasks.setSubgenSrcPath(this);
+    tasks.setSubgenDestPath(this);
   }
 
-  get writing() {
-    return {
-      activateSubgen() {
-        tasks.activateSubgen(this);
-      }
-    }
+  writing() {
+    tasks.activateSubgen(this);
   }
 
-  get end() {
-    return {
-      output() {
-        if (this.genData.activation.get('hasError')) {
-          this.log.error(this.genData.activation.getIn(['data', 'err']));
-        } else {
-          this.log.ok(`Activated ${this.subgenName}!`);
-        }
-      }
+  end() {
+    if (this.genData.activation.get('hasError')) {
+      this.log.error(this.genData.activation.getIn(['data', 'err']));
+    } else {
+      this.log.ok(`Activated ${this.subgenName}!`);
     }
   }
 }
