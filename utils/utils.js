@@ -171,7 +171,7 @@ function checkPkgExists(pkgName, installed, exact=true) {
  *
  * @param hostPkg   Json object of the host package
  * @param subgenPkg Json object of the subgen package
- * @returns {boolean}
+ * @returns {Msg}
  */
 function checkHostgenDependency(hostPkg, subgenPkg) {
   const hostVersion = hostPkg.version;
